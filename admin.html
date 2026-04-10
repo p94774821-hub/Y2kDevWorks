@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin - Y2K DevWorks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0a0a, #1a0000);
+      color: white;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+    
+    /* TELA DE LOGIN */
+    #loginScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .login-box {
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 24px;
+      padding: 50px 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(255, 0, 0, 0.3);
+    }
+    
+    .login-box h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2rem;
+    }
+    
+    .login-box h1 i {
+      color: #ff0000;
+      margin-right: 10px;
+    }
+    
+    .input-group {
+      margin-bottom: 25px;
+    }
+    
+    .input-group label {
+      display: block;
+      color: #aaa;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 12px;
+      color: white;
+      font-size: 1rem;
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: #ff0000;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #ff1a1a, #b30000);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: all 0.3s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(255, 0, 0, 0.5);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      margin-top: 10px;
+    }
+    
+    .error {
+      color: #ff4444;
+      text-align: center;
+      margin-top: 15px;
+      display: none;
+    }
+    
+    /* PAINEL PRINCIPAL */
+    #adminPanel {
+      display: none;
+      padding: 30px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 0, 0, 0.3);
+    }
+    
+    .header h1 i {
+      color: #ff0000;
+      margin-right: 10px;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .tab {
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 0, 0, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .tab.active {
+      background: #ff0000;
+      border-color: #ff0000;
+    }
+    
+    .tab:hover {
+      background: rgba(255, 0, 0, 0.2);
+    }
+    
+    .panel {
+      display: none;
+      background: rgba(20, 20, 20, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 0, 0, 0.2);
+      border-radius: 16px;
+      padding: 30px;
+    }
+    
+    .panel.active {
+      display: block;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      color: #aaa;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 14px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 0, 0, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+    }
+    
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    
+    .projeto-item {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 0, 0, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .projeto-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .btn-remove {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    
+    .btn-add {
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px dashed rgba(255, 0, 0, 0.4);
+      color: #ff4444;
+      padding: 15px;
+      border-radius: 8px;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    
+    .success-msg {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #10b981;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .status-badge {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #10b981;
+    }
+  </style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <h1><i class="fas fa-terminal"></i> Y2K Admin</h1>
+    <form onsubmit="login(event)">
+      <div class="input-group">
+        <label>Senha de Acesso</label>
+        <input type="password" id="passwordInput" placeholder="Digite a senha" required>
+      </div>
+      <button type="submit" class="btn">Entrar</button>
+    </form>
+    <div class="error" id="loginError">Senha incorreta!</div>
+  </div>
+</div>
+
+<!-- PAINEL ADMIN -->
+<div id="adminPanel">
+  <div class="header">
+    <h1><i class="fas fa-terminal"></i> Painel Administrativo</h1>
+    <button class="btn-secondary btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('hero')"><i class="fas fa-home"></i> Hero</div>
+    <div class="tab" onclick="showTab('projetos')"><i class="fas fa-code"></i> Projetos</div>
+    <div class="tab" onclick="showTab('sobre')"><i class="fas fa-user"></i> Sobre</div>
+    <div class="tab" onclick="showTab('contato')"><i class="fas fa-envelope"></i> Contato</div>
+  </div>
+
+  <!-- PAINEL HERO -->
+  <div id="hero-panel" class="panel active">
+    <h2 style="margin-bottom: 25px;">Editar Hero Section</h2>
+    <div class="form-group">
+      <label>Badge</label>
+      <input type="text" id="hero-badge">
+    </div>
+    <div class="form-group">
+      <label>Título</label>
+      <input type="text" id="hero-titulo">
+    </div>
+    <div class="form-group">
+      <label>Bio</label>
+      <input type="text" id="hero-bio">
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea id="hero-descricao"></textarea>
+    </div>
+    
+    <h3 style="margin: 30px 0 20px;">Estatísticas</h3>
+    <div class="stats-grid">
+      <div class="form-group"><label>Stat 1 - Valor</label><input type="number" id="stat1-valor"></div>
+      <div class="form-group"><label>Stat 1 - Label</label><input type="text" id="stat1-label"></div>
+      <div class="form-group"><label>Stat 2 - Valor</label><input type="number" id="stat2-valor"></div>
+      <div class="form-group"><label>Stat 2 - Label</label><input type="text" id="stat2-label"></div>
+      <div class="form-group"><label>Stat 3 - Valor</label><input type="number" id="stat3-valor"></div>
+      <div class="form-group"><label>Stat 3 - Label</label><input type="text" id="stat3-label"></div>
+    </div>
+    
+    <button class="btn" onclick="saveHero()"><i class="fas fa-save"></i> Salvar Hero</button>
+    <div class="success-msg" id="hero-success">✅ Salvo com sucesso!</div>
+  </div>
+
+  <!-- PAINEL PROJETOS -->
+  <div id="projetos-panel" class="panel">
+    <h2 style="margin-bottom: 25px;">Gerenciar Projetos</h2>
+    <div id="projetos-container"></div>
+    <button class="btn-add" onclick="addProjeto()"><i class="fas fa-plus"></i> Adicionar Projeto</button>
+    <button class="btn" onclick="saveProjetos()" style="margin-top: 30px;"><i class="fas fa-save"></i> Salvar Projetos</button>
+    <div class="success-msg" id="projetos-success">✅ Projetos salvos!</div>
+  </div>
+
+  <!-- PAINEL SOBRE -->
+  <div id="sobre-panel" class="panel">
+    <h2 style="margin-bottom: 25px;">Editar Seção Sobre</h2>
+    <div class="form-group"><label>Nome</label><input type="text" id="sobre-nome"></div>
+    <div class="form-group"><label>Bio</label><input type="text" id="sobre-bio"></div>
+    <div class="form-group"><label>Texto</label><textarea id="sobre-texto"></textarea></div>
+    <div class="form-group"><label>Skills (separadas por vírgula)</label><input type="text" id="sobre-skills"></div>
+    <button class="btn" onclick="saveSobre()"><i class="fas fa-save"></i> Salvar Sobre</button>
+    <div class="success-msg" id="sobre-success">✅ Salvo com sucesso!</div>
+  </div>
+
+  <!-- PAINEL CONTATO -->
+  <div id="contato-panel" class="panel">
+    <h2 style="margin-bottom: 25px;">Editar Contato</h2>
+    <div class="form-group"><label>Discord</label><input type="text" id="contato-discord"></div>
+    <div class="form-group"><label>Email</label><input type="email" id="contato-email"></div>
+    <div class="form-group"><label>Horário Seg-Sex</label><input type="text" id="contato-horario-semana"></div>
+    <div class="form-group"><label>Horário Sáb-Dom</label><input type="text" id="contato-horario-fim"></div>
+    <button class="btn" onclick="saveContato()"><i class="fas fa-save"></i> Salvar Contato</button>
+    <div class="success-msg" id="contato-success">✅ Salvo com sucesso!</div>
+  </div>
+  
+  <div class="status-badge" id="saveStatus">🟢 Conectado ao servidor</div>
+</div>
+
+<script>
+let contentData = {};
+let adminPassword = '';
+
+// Verificar se já está logado (salva no sessionStorage)
+if (sessionStorage.getItem('admin_logged') === 'true') {
+  showPanel();
+}
+
+async function login(e) {
+  e.preventDefault();
+  const password = document.getElementById('passwordInput').value;
+  
+  try {
+    const res = await fetch('/api/content');
+    const data = await res.json();
+    contentData = data;
+    
+    // Testa a senha tentando salvar
+    const testRes = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: password, content: contentData })
+    });
+    
+    if (testRes.ok) {
+      adminPassword = password;
+      sessionStorage.setItem('admin_logged', 'true');
+      sessionStorage.setItem('admin_password', password);
+      showPanel();
+      loadAllData();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  } catch (error) {
+    alert('Erro ao conectar com o servidor. Verifique se a API está rodando.');
+  }
+}
+
+function showPanel() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+  adminPassword = sessionStorage.getItem('admin_password');
+}
+
+function logout() {
+  sessionStorage.removeItem('admin_logged');
+  sessionStorage.removeItem('admin_password');
+  location.reload();
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tab + '-panel').classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'projetos') loadProjetos();
+}
+
+async function loadAllData() {
+  const res = await fetch('/api/content');
+  contentData = await res.json();
+  
+  // Hero
+  document.getElementById('hero-badge').value = contentData.hero.badge;
+  document.getElementById('hero-titulo').value = contentData.hero.titulo;
+  document.getElementById('hero-bio').value = contentData.hero.bio;
+  document.getElementById('hero-descricao').value = contentData.hero.descricao;
+  document.getElementById('stat1-valor').value = contentData.stats[0].valor;
+  document.getElementById('stat1-label').value = contentData.stats[0].label;
+  document.getElementById('stat2-valor').value = contentData.stats[1].valor;
+  document.getElementById('stat2-label').value = contentData.stats[1].label;
+  document.getElementById('stat3-valor').value = contentData.stats[2].valor;
+  document.getElementById('stat3-label').value = contentData.stats[2].label;
+  
+  // Sobre
+  document.getElementById('sobre-nome').value = contentData.sobre.nome;
+  document.getElementById('sobre-bio').value = contentData.sobre.bio;
+  document.getElementById('sobre-texto').value = contentData.sobre.texto;
+  document.getElementById('sobre-skills').value = contentData.sobre.skills.join(', ');
+  
+  // Contato
+  document.getElementById('contato-discord').value = contentData.contato.discord;
+  document.getElementById('contato-email').value = contentData.contato.email;
+  document.getElementById('contato-horario-semana').value = contentData.contato.horario_semana;
+  document.getElementById('contato-horario-fim').value = contentData.contato.horario_fim;
+}
+
+function loadProjetos() {
+  const container = document.getElementById('projetos-container');
+  container.innerHTML = '';
+  contentData.projetos.forEach((p, i) => {
+    container.innerHTML += `
+      <div class="projeto-item">
+        <div class="projeto-header">
+          <strong>Projeto ${i + 1}</strong>
+          <button class="btn-remove" onclick="removeProjeto(${i})"><i class="fas fa-trash"></i></button>
+        </div>
+        <div class="form-group"><label>Nome</label><input type="text" id="proj-nome-${i}" value="${p.nome}"></div>
+        <div class="form-group"><label>Tipo</label><input type="text" id="proj-tipo-${i}" value="${p.tipo}"></div>
+        <div class="form-group"><label>Descrição</label><textarea id="proj-desc-${i}">${p.descricao}</textarea></div>
+        <div class="form-group"><label>Ícone</label><input type="text" id="proj-icone-${i}" value="${p.icone}"></div>
+      </div>
+    `;
+  });
+}
+
+function addProjeto() {
+  contentData.projetos.push({ nome: '', tipo: '', descricao: '', icone: 'fa-code' });
+  loadProjetos();
+}
+
+function removeProjeto(index) {
+  contentData.projetos.splice(index, 1);
+  loadProjetos();
+}
+
+async function saveData(data, successId) {
+  try {
+    const res = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: adminPassword, content: data })
+    });
+    
+    if (res.ok) {
+      contentData = data;
+      document.getElementById(successId).style.display = 'block';
+      setTimeout(() => document.getElementById(successId).style.display = 'none', 3000);
+    }
+  } catch (error) {
+    alert('Erro ao salvar: ' + error.message);
+  }
+}
+
+async function saveHero() {
+  contentData.hero.badge = document.getElementById('hero-badge').value;
+  contentData.hero.titulo = document.getElementById('hero-titulo').value;
+  contentData.hero.bio = document.getElementById('hero-bio').value;
+  contentData.hero.descricao = document.getElementById('hero-descricao').value;
+  contentData.stats[0].valor = parseInt(document.getElementById('stat1-valor').value);
+  contentData.stats[0].label = document.getElementById('stat1-label').value;
+  contentData.stats[1].valor = parseInt(document.getElementById('stat2-valor').value);
+  contentData.stats[1].label = document.getElementById('stat2-label').value;
+  contentData.stats[2].valor = parseInt(document.getElementById('stat3-valor').value);
+  contentData.stats[2].label = document.getElementById('stat3-label').value;
+  await saveData(contentData, 'hero-success');
+}
+
+async function saveProjetos() {
+  const projetos = [];
+  document.querySelectorAll('.projeto-item').forEach((item, i) => {
+    projetos.push({
+      nome: document.getElementById(`proj-nome-${i}`)?.value || '',
+      tipo: document.getElementById(`proj-tipo-${i}`)?.value || '',
+      descricao: document.getElementById(`proj-desc-${i}`)?.value || '',
+      icone: document.getElementById(`proj-icone-${i}`)?.value || 'fa-code'
+    });
+  });
+  contentData.projetos = projetos;
+  await saveData(contentData, 'projetos-success');
+}
+
+async function saveSobre() {
+  contentData.sobre.nome = document.getElementById('sobre-nome').value;
+  contentData.sobre.bio = document.getElementById('sobre-bio').value;
+  contentData.sobre.texto = document.getElementById('sobre-texto').value;
+  contentData.sobre.skills = document.getElementById('sobre-skills').value.split(',').map(s => s.trim());
+  await saveData(contentData, 'sobre-success');
+}
+
+async function saveContato() {
+  contentData.contato.discord = document.getElementById('contato-discord').value;
+  contentData.contato.email = document.getElementById('contato-email').value;
+  contentData.contato.horario_semana = document.getElementById('contato-horario-semana').value;
+  contentData.contato.horario_fim = document.getElementById('contato-horario-fim').value;
+  await saveData(contentData, 'contato-success');
+}
+</script>
+</body>
+      </html>
