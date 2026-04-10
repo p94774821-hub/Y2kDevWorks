@@ -55,7 +55,7 @@ function blockMobile(req, res, next) {
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
   
   if (isMobile && req.path.startsWith('/api/')) {
-    if (req.path === '/api/login') {
+    if (req.path === '/api/login' || req.path === '/api/bot/heartbeat') {
       return next();
     }
     return res.status(403).json({ error: 'Acesso administrativo apenas por desktop' });
@@ -170,14 +170,14 @@ const botsData = {
     id: 'insight',
     nome: 'Insight',
     avatar: 'fa-lightbulb',
-    status: 'online',
-    servidores: 47,
-    usuarios: 12500,
-    comandos: 342,
-    ping: 42,
-    uptime: '99.98%',
+    status: 'offline',
+    servidores: 0,
+    usuarios: 0,
+    comandos: 0,
+    ping: 0,
+    uptime: '0%',
     versao: '2.1.0',
-    ultimaAtualizacao: '2026-04-10',
+    ultimaAtualizacao: null,
     token: process.env.INSIGHT_TOKEN || 'INSIGHT_TOKEN_123',
     descricao: 'Sistema de sugestões com votação e análise de engajamento'
   },
@@ -185,14 +185,14 @@ const botsData = {
     id: 'atlas',
     nome: 'Atlas',
     avatar: 'fa-building',
-    status: 'online',
-    servidores: 32,
-    usuarios: 8900,
-    comandos: 156,
-    ping: 38,
-    uptime: '99.95%',
+    status: 'offline',
+    servidores: 0,
+    usuarios: 0,
+    comandos: 0,
+    ping: 0,
+    uptime: '0%',
     versao: '1.5.2',
-    ultimaAtualizacao: '2026-04-09',
+    ultimaAtualizacao: null,
     token: process.env.ATLAS_TOKEN || 'ATLAS_TOKEN_456',
     descricao: 'Sistema de registro e gerenciamento de imóveis para servidores RP'
   },
@@ -200,78 +200,57 @@ const botsData = {
     id: 'vehix',
     nome: 'Vehix',
     avatar: 'fa-car',
-    status: 'online',
-    servidores: 28,
-    usuarios: 7200,
-    comandos: 98,
-    ping: 45,
-    uptime: '99.92%',
+    status: 'offline',
+    servidores: 0,
+    usuarios: 0,
+    comandos: 0,
+    ping: 0,
+    uptime: '0%',
     versao: '1.2.0',
-    ultimaAtualizacao: '2026-04-08',
+    ultimaAtualizacao: null,
     token: process.env.VEHIX_TOKEN || 'VEHIX_TOKEN_789',
     descricao: 'Sistema completo de registro e controle de veículos'
-  },
-  hostville: {
-    id: 'hostville',
-    nome: 'HostVille-BOT',
-    avatar: 'fa-shield-alt',
-    status: 'online',
-    servidores: 89,
-    usuarios: 24000,
-    comandos: 567,
-    ping: 35,
-    uptime: '99.99%',
-    versao: '3.0.1',
-    ultimaAtualizacao: '2026-04-10',
-    token: process.env.HOSTVILLE_TOKEN || 'HOSTVILLE_TOKEN_ABC',
-    descricao: 'Bot principal de moderação e gerenciamento'
-  },
-  hostvilleWarn: {
-    id: 'hostvilleWarn',
-    nome: 'HostVille Warn System',
-    avatar: 'fa-exclamation-triangle',
-    status: 'online',
-    servidores: 76,
-    usuarios: 21000,
-    comandos: 234,
-    ping: 40,
-    uptime: '99.97%',
-    versao: '2.0.0',
-    ultimaAtualizacao: '2026-04-10',
-    token: process.env.HOSTVILLE_WARN_TOKEN || 'HOSTVILLE_WARN_TOKEN_DEF',
-    descricao: 'Sistema avançado de warns e punições'
-  },
-  hostvilleUtility: {
-    id: 'hostvilleUtility',
-    nome: 'HostVille Utility Bot',
-    avatar: 'fa-tools',
-    status: 'manutencao',
-    servidores: 54,
-    usuarios: 15000,
-    comandos: 189,
-    ping: 55,
-    uptime: '98.50%',
-    versao: '1.8.5',
-    ultimaAtualizacao: '2026-04-07',
-    token: process.env.HOSTVILLE_UTILITY_TOKEN || 'HOSTVILLE_UTILITY_TOKEN_GHI',
-    descricao: 'Bot utilitário com funções diversas'
-  },
-  cidadeDeusRP: {
-    id: 'cidadeDeusRP',
-    nome: 'Cidade de Deus RP',
-    avatar: 'fa-list-check',
-    status: 'online',
-    servidores: 23,
-    usuarios: 5800,
-    comandos: 78,
-    ping: 48,
-    uptime: '99.93%',
-    versao: '1.0.0',
-    ultimaAtualizacao: '2026-04-10',
-    token: process.env.CIDADE_DEUS_RP_TOKEN || 'CIDADE_DEUS_RP_TOKEN_JKL',
-    descricao: 'Bot completo de whitelist para servidor de Roleplay'
   }
 };
+
+// ===== ENDPOINT PARA OS BOTS ATUALIZAREM SEU STATUS (HEARTBEAT) =====
+// Este endpoint NÃO requer JWT, apenas o token do bot
+app.post('/api/bot/heartbeat', (req, res) => {
+  const { botId, token, status, servidores, usuarios, comandos, ping, uptime, versao } = req.body;
+  
+  if (!botId || !token) {
+    return res.status(400).json({ error: 'botId e token são obrigatórios' });
+  }
+  
+  const bot = botsData[botId];
+  if (!bot) {
+    return res.status(404).json({ error: 'Bot não encontrado' });
+  }
+  
+  // Verifica o token do bot
+  if (token !== bot.token) {
+    return res.status(401).json({ error: 'Token inválido' });
+  }
+  
+  // Atualiza os dados do bot
+  if (status) bot.status = status;
+  if (servidores !== undefined) bot.servidores = parseInt(servidores) || 0;
+  if (usuarios !== undefined) bot.usuarios = parseInt(usuarios) || 0;
+  if (comandos !== undefined) bot.comandos = parseInt(comandos) || 0;
+  if (ping !== undefined) bot.ping = parseInt(ping) || 0;
+  if (uptime) bot.uptime = uptime;
+  if (versao) bot.versao = versao;
+  
+  bot.ultimaAtualizacao = new Date().toISOString();
+  
+  console.log(`📡 Heartbeat recebido: ${bot.nome} - Status: ${bot.status}, Servidores: ${bot.servidores}, Usuários: ${bot.usuarios}`);
+  
+  res.json({
+    success: true,
+    message: 'Status atualizado com sucesso!',
+    receivedAt: new Date().toISOString()
+  });
+});
 
 // ===== API DE BOTS =====
 
@@ -430,17 +409,13 @@ function getDefaultContent() {
     },
     stats: [
       { valor: 150, label: "Usuários Ajudados" },
-      { valor: 7, label: "Projetos Ativos" },
+      { valor: 3, label: "Projetos Ativos" },
       { valor: 1, label: "Ano de XP" }
     ],
     projetos: [
       { id: "proj_1", nome: "Insight", tipo: "Sistema de Sugestões", descricao: "Sistema completo de sugestões com votação.", icone: "fa-lightbulb" },
       { id: "proj_2", nome: "Atlas", tipo: "Registro de Imóveis", descricao: "Sistema de registro de propriedades para RP.", icone: "fa-building" },
-      { id: "proj_3", nome: "Vehix", tipo: "Registro de Veículos", descricao: "Sistema completo de registro de veículos.", icone: "fa-car" },
-      { id: "proj_4", nome: "HostVille Services", tipo: "Moderação & Staff", descricao: "Bots de moderação e warns.", icone: "fa-shield-alt" },
-      { id: "proj_5", nome: "Cidade de Deus RP", tipo: "WhiteList Completa", descricao: "Bot completo de whitelist para RP.", icone: "fa-list-check" },
-      { id: "proj_6", nome: "HostVille Warn", tipo: "Sistema de Warns", descricao: "Sistema avançado de warns.", icone: "fa-exclamation-triangle" },
-      { id: "proj_7", nome: "HostVille Utility", tipo: "Bot Utilitário", descricao: "Funções diversas para servidores.", icone: "fa-tools" }
+      { id: "proj_3", nome: "Vehix", tipo: "Registro de Veículos", descricao: "Sistema completo de registro de veículos.", icone: "fa-car" }
     ],
     sobre: {
       nome: "Isac",
@@ -508,5 +483,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log(`🔐 JWT configurado com segurança`);
   console.log(`🤖 Monitor de Bots ativo (${Object.keys(botsData).length} bots)`);
+  console.log(`📡 Endpoint Heartbeat: /api/bot/heartbeat`);
   console.log(`📁 Diretório: ${__dirname}`);
 });
