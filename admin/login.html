@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Painel Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0a0a0a, #1a0000);
+      font-family: 'Inter', sans-serif;
+    }
+    .login-box {
+      background: rgba(20, 20, 20, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 0, 0, 0.2);
+      border-radius: 24px;
+      padding: 50px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(255, 0, 0, 0.2);
+    }
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    .logo span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #ff0000;
+      text-shadow: 0 0 30px #ff0000;
+    }
+    .input-group {
+      margin-bottom: 25px;
+    }
+    label {
+      display: block;
+      color: #aaa;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    input {
+      width: 100%;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 0, 0, 0.2);
+      border-radius: 12px;
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #ff0000;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    }
+    button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #ff1a1a, #b30000);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(255, 0, 0, 0.4);
+    }
+    .error {
+      color: #ff4444;
+      text-align: center;
+      margin-top: 15px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="logo">
+      <span>&gt;_ ADMIN</span>
+    </div>
+    <h1>Acesso Restrito</h1>
+    <form id="loginForm" onsubmit="login(event)">
+      <div class="input-group">
+        <label>Usuário</label>
+        <input type="text" id="username" placeholder="admin" required>
+      </div>
+      <div class="input-group">
+        <label>Senha</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit">Entrar</button>
+      <div class="error" id="errorMsg">Usuário ou senha incorretos</div>
+    </form>
+  </div>
+
+  <script>
+    // ALTERE AQUI SUA SENHA
+    const ADMIN_USER = 'admin';
+    const ADMIN_PASS = 'Y2k2024@';
+
+    function login(e) {
+      e.preventDefault();
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      
+      if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        localStorage.setItem('admin_logged', 'true');
+        window.location.href = '/admin/painel.html';
+      } else {
+        document.getElementById('errorMsg').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
