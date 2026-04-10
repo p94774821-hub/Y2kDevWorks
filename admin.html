@@ -10,11 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    /* ===== RESET & VARIÁVEIS ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
       --primary: #ff1a1a;
@@ -56,9 +53,8 @@
       content: '';
       position: fixed;
       inset: 0;
-      background: 
-        radial-gradient(circle at 20% 30%, rgba(255, 0, 0, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(255, 50, 50, 0.05) 0%, transparent 50%);
+      background: radial-gradient(circle at 20% 30%, rgba(255, 0, 0, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(255, 50, 50, 0.05) 0%, transparent 50%);
       z-index: -1;
       animation: bgPulse 8s ease-in-out infinite alternate;
     }
@@ -68,18 +64,121 @@
       100% { opacity: 1; transform: scale(1.05); }
     }
 
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--primary-dark), var(--primary)); border-radius: 10px; }
+
+    /* ===== MODAL DE CONFIRMAÇÃO ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
     }
 
-    ::-webkit-scrollbar-track {
-      background: #000;
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+      background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(10, 10, 10, 0.98));
+      border: 1.5px solid var(--border-light);
+      border-radius: 24px;
+      padding: 35px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: var(--shadow-card), 0 0 60px rgba(255, 0, 0, 0.2);
+      animation: modalSlideIn 0.3s ease;
     }
 
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--primary-dark), var(--primary));
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-icon {
+      font-size: 3.5rem;
+      color: var(--warning);
+      margin-bottom: 20px;
+    }
+
+    .modal-box h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .modal-box p {
+      color: var(--gray-400);
+      margin-bottom: 30px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 12px 28px;
       border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .modal-btn.cancel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      color: var(--gray-300);
+    }
+
+    .modal-btn.cancel:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-btn.confirm {
+      background: linear-gradient(135deg, var(--danger), #c82333);
+      color: white;
+    }
+
+    .modal-btn.confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    }
+
+    /* ===== LOADING OVERLAY ===== */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1001;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-overlay.active { display: flex; }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(255, 0, 0, 0.2);
+      border-top-color: var(--primary-neon);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      box-shadow: 0 0 30px var(--primary-neon);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     /* ===== TELA DE BLOQUEIO MOBILE ===== */
@@ -95,10 +194,7 @@
       background: var(--darker);
     }
 
-    .mobile-block-container {
-      max-width: 450px;
-      width: 100%;
-    }
+    .mobile-block-container { max-width: 450px; width: 100%; }
 
     .mobile-block-card {
       background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(10, 10, 10, 0.98));
@@ -166,22 +262,9 @@
       gap: 8px;
     }
 
-    .device-icon i {
-      font-size: 2.5rem;
-      color: var(--gray-600);
-    }
-
-    .device-icon.active i {
-      color: var(--success);
-      filter: drop-shadow(0 0 15px var(--success));
-    }
-
-    .device-icon span {
-      font-size: 0.85rem;
-      color: var(--gray-500);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+    .device-icon i { font-size: 2.5rem; color: var(--gray-600); }
+    .device-icon.active i { color: var(--success); filter: drop-shadow(0 0 15px var(--success)); }
+    .device-icon span { font-size: 0.85rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; }
 
     .btn-back {
       display: inline-flex;
@@ -213,10 +296,7 @@
       padding: 20px;
     }
 
-    .login-container {
-      width: 100%;
-      max-width: 420px;
-    }
+    .login-container { width: 100%; max-width: 420px; }
 
     .login-box {
       background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(10, 10, 10, 0.98));
@@ -239,10 +319,7 @@
       background: linear-gradient(90deg, transparent, var(--primary-neon), var(--primary-light), transparent);
     }
 
-    .login-header {
-      text-align: center;
-      margin-bottom: 35px;
-    }
+    .login-header { text-align: center; margin-bottom: 35px; }
 
     .login-logo {
       font-family: 'JetBrains Mono', monospace;
@@ -256,23 +333,10 @@
       margin-bottom: 8px;
     }
 
-    .login-header h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 6px;
-    }
+    .login-header h1 { font-size: 1.8rem; font-weight: 700; color: white; margin-bottom: 6px; }
+    .login-header p { color: var(--gray-500); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; }
 
-    .login-header p {
-      color: var(--gray-500);
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .input-group {
-      margin-bottom: 25px;
-    }
+    .input-group { margin-bottom: 25px; }
 
     .input-group label {
       display: block;
@@ -284,14 +348,9 @@
       font-weight: 600;
     }
 
-    .input-group label i {
-      color: var(--primary-neon);
-      margin-right: 8px;
-    }
+    .input-group label i { color: var(--primary-neon); margin-right: 8px; }
 
-    .input-wrapper {
-      position: relative;
-    }
+    .input-wrapper { position: relative; }
 
     .input-wrapper i {
       position: absolute;
@@ -329,9 +388,7 @@
       transition: color 0.3s;
     }
 
-    .password-toggle:hover {
-      color: white;
-    }
+    .password-toggle:hover { color: white; }
 
     .btn-login {
       width: 100%;
@@ -362,14 +419,9 @@
       transition: left 0.6s;
     }
 
-    .btn-login:hover::before {
-      left: 100%;
-    }
-
-    .btn-login:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-glow);
-    }
+    .btn-login:hover::before { left: 100%; }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .error-message {
       background: rgba(239, 68, 68, 0.1);
@@ -382,23 +434,11 @@
       display: none;
     }
 
-    .login-footer {
-      text-align: center;
-      margin-top: 22px;
-      color: var(--gray-600);
-      font-size: 0.85rem;
-    }
+    .login-footer { text-align: center; margin-top: 22px; color: var(--gray-600); font-size: 0.85rem; }
 
     /* ===== PAINEL PRINCIPAL ===== */
-    #adminPanel {
-      display: none;
-      min-height: 100vh;
-    }
-
-    .admin-layout {
-      display: flex;
-      min-height: 100vh;
-    }
+    #adminPanel { display: none; min-height: 100vh; }
+    .admin-layout { display: flex; min-height: 100vh; }
 
     /* Sidebar */
     .sidebar {
@@ -415,10 +455,7 @@
       z-index: 100;
     }
 
-    .sidebar-header {
-      padding: 0 20px 25px;
-      border-bottom: 1px solid var(--border-light);
-    }
+    .sidebar-header { padding: 0 20px 25px; border-bottom: 1px solid var(--border-light); }
 
     .sidebar-logo {
       font-family: 'JetBrains Mono', monospace;
@@ -432,20 +469,9 @@
       margin-bottom: 8px;
     }
 
-    .sidebar-subtitle {
-      color: var(--gray-500);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .sidebar-nav {
-      padding: 25px 12px;
-    }
-
-    .nav-section {
-      margin-bottom: 25px;
-    }
+    .sidebar-subtitle { color: var(--gray-500); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; }
+    .sidebar-nav { padding: 25px 12px; }
+    .nav-section { margin-bottom: 25px; }
 
     .nav-section-title {
       color: var(--gray-600);
@@ -470,15 +496,8 @@
       font-size: 0.9rem;
     }
 
-    .nav-item i {
-      width: 22px;
-      font-size: 1.1rem;
-    }
-
-    .nav-item:hover {
-      background: rgba(255, 0, 0, 0.08);
-      color: white;
-    }
+    .nav-item i { width: 22px; font-size: 1.1rem; }
+    .nav-item:hover { background: rgba(255, 0, 0, 0.08); color: white; }
 
     .nav-item.active {
       background: linear-gradient(135deg, rgba(255, 0, 0, 0.15), rgba(255, 0, 0, 0.05));
@@ -487,22 +506,11 @@
       box-shadow: 0 0 20px rgba(255, 0, 0, 0.15);
     }
 
-    .nav-item.active i {
-      color: var(--primary-neon);
-    }
+    .nav-item.active i { color: var(--primary-neon); }
 
-    .sidebar-footer {
-      padding: 25px 20px;
-      border-top: 1px solid var(--border-light);
-      margin-top: auto;
-    }
+    .sidebar-footer { padding: 25px 20px; border-top: 1px solid var(--border-light); margin-top: auto; }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
+    .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
 
     .user-avatar {
       width: 40px;
@@ -518,17 +526,8 @@
       border: 2px solid var(--border-medium);
     }
 
-    .user-details h4 {
-      color: white;
-      font-weight: 600;
-      margin-bottom: 2px;
-      font-size: 0.9rem;
-    }
-
-    .user-details p {
-      color: var(--gray-500);
-      font-size: 0.75rem;
-    }
+    .user-details h4 { color: white; font-weight: 600; margin-bottom: 2px; font-size: 0.9rem; }
+    .user-details p { color: var(--gray-500); font-size: 0.75rem; }
 
     .btn-logout {
       width: 100%;
@@ -547,10 +546,7 @@
       font-size: 0.85rem;
     }
 
-    .btn-logout:hover {
-      background: var(--danger);
-      color: white;
-    }
+    .btn-logout:hover { background: var(--danger); color: white; }
 
     /* Main Content */
     .main-content {
@@ -578,15 +574,9 @@
       background-clip: text;
     }
 
-    .page-title p {
-      color: var(--gray-500);
-      margin-top: 4px;
-    }
+    .page-title p { color: var(--gray-500); margin-top: 4px; }
 
-    .top-actions {
-      display: flex;
-      gap: 10px;
-    }
+    .top-actions { display: flex; gap: 10px; }
 
     .btn-action {
       padding: 10px 18px;
@@ -602,29 +592,18 @@
       font-size: 0.9rem;
     }
 
-    .btn-action:hover {
-      background: rgba(255, 0, 0, 0.08);
-      border-color: var(--primary);
-    }
+    .btn-action:hover { background: rgba(255, 0, 0, 0.08); border-color: var(--primary); }
 
     /* Panels */
-    .panel {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .panel.active {
-      display: block;
-    }
+    .panel { display: none; animation: fadeIn 0.3s ease; }
+    .panel.active { display: block; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ===== DASHBOARD COMPLETA ===== */
-    
-    /* Stats Cards */
+    /* Dashboard */
     .stats-overview {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -641,55 +620,17 @@
       transition: all 0.3s;
     }
 
-    .stat-card:hover {
-      transform: translateY(-3px);
-      border-color: var(--primary);
-      box-shadow: 0 10px 30px rgba(255, 0, 0, 0.15);
-    }
+    .stat-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(255, 0, 0, 0.15); }
 
-    .stat-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
+    .stat-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .stat-card-header i { font-size: 2rem; color: var(--primary-neon); filter: drop-shadow(0 0 15px var(--primary-neon)); }
+    .stat-card-value { font-size: 2.2rem; font-weight: 800; color: white; }
+    .stat-card-label { color: var(--gray-500); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
-    .stat-card-header i {
-      font-size: 2rem;
-      color: var(--primary-neon);
-      filter: drop-shadow(0 0 15px var(--primary-neon));
-    }
+    .stat-trend { display: flex; align-items: center; gap: 5px; margin-top: 8px; font-size: 0.8rem; }
+    .stat-trend.up { color: var(--success); }
+    .stat-trend.down { color: var(--danger); }
 
-    .stat-card-value {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: white;
-    }
-
-    .stat-card-label {
-      color: var(--gray-500);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .stat-trend {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 8px;
-      font-size: 0.8rem;
-    }
-
-    .stat-trend.up {
-      color: var(--success);
-    }
-
-    .stat-trend.down {
-      color: var(--danger);
-    }
-
-    /* Charts Row */
     .charts-row {
       display: grid;
       grid-template-columns: 1.5fr 1fr;
@@ -705,23 +646,9 @@
       padding: 22px;
     }
 
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .chart-header h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: white;
-    }
-
-    .chart-header h3 i {
-      color: var(--primary-neon);
-      margin-right: 8px;
-    }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .chart-header h3 { font-size: 1.1rem; font-weight: 600; color: white; }
+    .chart-header h3 i { color: var(--primary-neon); margin-right: 8px; }
 
     .chart-container {
       height: 200px;
@@ -731,14 +658,7 @@
       padding: 10px 0;
     }
 
-    .chart-bar-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
+    .chart-bar-container { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .chart-bar {
       width: 100%;
       background: linear-gradient(180deg, var(--primary), var(--primary-dark));
@@ -747,66 +667,18 @@
       transition: height 0.5s ease;
       box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
     }
+    .chart-label { color: var(--gray-500); font-size: 0.75rem; text-transform: uppercase; }
+    .chart-value { color: white; font-weight: 700; font-size: 0.85rem; }
 
-    .chart-label {
-      color: var(--gray-500);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-    }
+    .distribution-stats { display: flex; flex-direction: column; gap: 18px; }
+    .dist-item { display: flex; align-items: center; gap: 12px; }
+    .dist-info { flex: 1; }
+    .dist-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .dist-name { color: var(--gray-300); font-size: 0.9rem; }
+    .dist-value { color: white; font-weight: 600; }
+    .dist-bar { height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; }
+    .dist-progress { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
 
-    .chart-value {
-      color: white;
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-
-    /* Distribution Stats */
-    .distribution-stats {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .dist-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .dist-info {
-      flex: 1;
-    }
-
-    .dist-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
-
-    .dist-name {
-      color: var(--gray-300);
-      font-size: 0.9rem;
-    }
-
-    .dist-value {
-      color: white;
-      font-weight: 600;
-    }
-
-    .dist-bar {
-      height: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .dist-progress {
-      height: 100%;
-      border-radius: 10px;
-      transition: width 0.5s ease;
-    }
-
-    /* Recent Activity */
     .activity-card {
       background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(10, 10, 10, 0.9));
       backdrop-filter: blur(20px);
@@ -816,29 +688,11 @@
       margin-bottom: 25px;
     }
 
-    .activity-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+    .activity-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .activity-header h3 { font-size: 1.1rem; font-weight: 600; color: white; }
+    .activity-header h3 i { color: var(--primary-neon); margin-right: 8px; }
 
-    .activity-header h3 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: white;
-    }
-
-    .activity-header h3 i {
-      color: var(--primary-neon);
-      margin-right: 8px;
-    }
-
-    .activity-list {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+    .activity-list { display: flex; flex-direction: column; gap: 15px; }
 
     .activity-item {
       display: flex;
@@ -861,22 +715,10 @@
       color: var(--primary-neon);
     }
 
-    .activity-content {
-      flex: 1;
-    }
+    .activity-content { flex: 1; }
+    .activity-title { color: white; font-weight: 600; margin-bottom: 4px; }
+    .activity-time { color: var(--gray-500); font-size: 0.8rem; }
 
-    .activity-title {
-      color: white;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .activity-time {
-      color: var(--gray-500);
-      font-size: 0.8rem;
-    }
-
-    /* Quick Actions */
     .quick-actions {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -899,18 +741,9 @@
       font-weight: 600;
     }
 
-    .quick-action-btn i {
-      color: var(--primary-neon);
-    }
+    .quick-action-btn i { color: var(--primary-neon); }
+    .quick-action-btn:hover { background: rgba(255, 0, 0, 0.08); border-color: var(--primary); color: white; transform: translateY(-2px); }
 
-    .quick-action-btn:hover {
-      background: rgba(255, 0, 0, 0.08);
-      border-color: var(--primary);
-      color: white;
-      transform: translateY(-2px);
-    }
-
-    /* System Status */
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -921,17 +754,10 @@
       font-weight: 600;
     }
 
-    .status-badge.online {
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--success);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
+    .status-badge.online { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-badge i { font-size: 0.6rem; }
 
-    .status-badge i {
-      font-size: 0.6rem;
-    }
-
-    /* Form Cards (para outras abas) */
+    /* Form Cards */
     .form-card {
       background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(10, 10, 10, 0.9));
       backdrop-filter: blur(20px);
@@ -951,43 +777,15 @@
       border-bottom: 1px solid var(--border-light);
     }
 
-    .form-card-header h2 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: white;
-    }
+    .form-card-header h2 { font-size: 1.5rem; font-weight: 700; color: white; }
+    .form-card-header h2 i { color: var(--primary-neon); margin-right: 8px; }
 
-    .form-card-header h2 i {
-      color: var(--primary-neon);
-      margin-right: 8px;
-    }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .form-group { margin-bottom: 5px; }
+    .form-group.full-width { grid-column: span 2; }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-    }
-
-    .form-group {
-      margin-bottom: 5px;
-    }
-
-    .form-group.full-width {
-      grid-column: span 2;
-    }
-
-    .form-group label {
-      display: block;
-      color: var(--gray-400);
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-
-    .form-group label i {
-      color: var(--primary-neon);
-      margin-right: 6px;
-    }
+    .form-group label { display: block; color: var(--gray-400); margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; }
+    .form-group label i { color: var(--primary-neon); margin-right: 6px; }
 
     .form-group input,
     .form-group textarea,
@@ -1011,17 +809,10 @@
       box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
     }
 
-    .form-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
+    .form-group textarea { min-height: 100px; resize: vertical; }
 
-    /* Projects List */
-    .projects-list {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
+    /* Projects */
+    .projects-list { display: flex; flex-direction: column; gap: 18px; }
 
     .project-item-card {
       background: rgba(0, 0, 0, 0.2);
@@ -1030,34 +821,12 @@
       padding: 20px;
     }
 
-    .project-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
+    .project-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .project-item-title { display: flex; align-items: center; gap: 10px; }
+    .project-item-title i { font-size: 1.5rem; color: var(--primary-neon); }
+    .project-item-title h3 { font-size: 1.2rem; font-weight: 700; color: white; }
 
-    .project-item-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .project-item-title i {
-      font-size: 1.5rem;
-      color: var(--primary-neon);
-    }
-
-    .project-item-title h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: white;
-    }
-
-    .project-actions {
-      display: flex;
-      gap: 8px;
-    }
+    .project-actions { display: flex; gap: 8px; }
 
     .btn-icon {
       width: 36px;
@@ -1073,36 +842,14 @@
       justify-content: center;
     }
 
-    .btn-icon:hover {
-      background: rgba(255, 0, 0, 0.1);
-      border-color: var(--primary);
-      color: var(--primary-neon);
-    }
+    .btn-icon:hover { background: rgba(255, 0, 0, 0.1); border-color: var(--primary); color: var(--primary-neon); }
+    .btn-icon.danger:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
+    .btn-icon:disabled { opacity: 0.3; pointer-events: none; }
 
-    .btn-icon.danger:hover {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: var(--danger);
-      color: var(--danger);
-    }
+    .project-item-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
 
-    .btn-icon:disabled {
-      opacity: 0.3;
-      pointer-events: none;
-    }
-
-    .project-item-fields {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    /* Skills Tags */
-    .skills-input-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    /* Skills */
+    .skills-input-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
 
     .skill-tag-input {
       display: inline-flex;
@@ -1115,15 +862,8 @@
       color: var(--primary-light);
     }
 
-    .skill-tag-input i {
-      cursor: pointer;
-      opacity: 0.6;
-    }
-
-    .skill-tag-input i:hover {
-      opacity: 1;
-      color: var(--danger);
-    }
+    .skill-tag-input i { cursor: pointer; opacity: 0.6; }
+    .skill-tag-input i:hover { opacity: 1; color: var(--danger); }
 
     .btn-add-skill {
       padding: 7px 18px;
@@ -1135,11 +875,7 @@
       transition: all 0.2s;
     }
 
-    .btn-add-skill:hover {
-      background: rgba(255, 0, 0, 0.08);
-      border-color: var(--primary);
-      color: var(--primary-light);
-    }
+    .btn-add-skill:hover { background: rgba(255, 0, 0, 0.08); border-color: var(--primary); color: var(--primary-light); }
 
     /* Buttons */
     .btn-save {
@@ -1159,10 +895,8 @@
       box-shadow: 0 4px 20px rgba(255, 0, 0, 0.3);
     }
 
-    .btn-save:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-glow);
-    }
+    .btn-save:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .btn-add {
       width: 100%;
@@ -1177,10 +911,7 @@
       margin-top: 22px;
     }
 
-    .btn-add:hover {
-      background: rgba(255, 0, 0, 0.08);
-      border-color: var(--primary);
-    }
+    .btn-add:hover { background: rgba(255, 0, 0, 0.08); border-color: var(--primary); }
 
     /* Success Message */
     .success-message {
@@ -1201,27 +932,35 @@
       z-index: 1000;
     }
 
-    .success-message i {
-      font-size: 1.3rem;
-    }
+    .success-message i { font-size: 1.3rem; }
 
     /* Responsive */
     @media (max-width: 1200px) {
-      .stats-overview {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .charts-row {
-        grid-template-columns: 1fr;
-      }
-      
-      .quick-actions {
-        grid-template-columns: 1fr;
-      }
+      .stats-overview { grid-template-columns: repeat(2, 1fr); }
+      .charts-row { grid-template-columns: 1fr; }
+      .quick-actions { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
+
+<!-- ===== MODAL DE CONFIRMAÇÃO ===== -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    <h3 id="modalTitle">Confirmar Ação</h3>
+    <p id="modalMessage">Tem certeza que deseja realizar esta ação?</p>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn confirm" id="modalConfirmBtn">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOADING OVERLAY ===== -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
 
 <!-- ===== TELA DE BLOQUEIO MOBILE ===== -->
 <div id="mobileBlockScreen">
@@ -1237,7 +976,7 @@
       </div>
       <p style="font-size: 0.9rem; color: var(--gray-500);"><i class="fas fa-info-circle"></i> Para melhor experiência de administração,<br>acesse este painel em um computador.</p>
       <a href="/" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar para o Site</a>
-      <div class="mobile-block-footer" style="margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border-light); color: var(--gray-500);"><i class="fas fa-terminal"></i> Y2K DevWorks <i class="fas fa-terminal"></i><br><span style="font-family: 'JetBrains Mono', monospace;">admin@y2k-nat</span></div>
+      <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border-light); color: var(--gray-500);"><i class="fas fa-terminal"></i> Y2K DevWorks <i class="fas fa-terminal"></i><br><span style="font-family: 'JetBrains Mono', monospace;">admin@y2k-nat</span></div>
     </div>
   </div>
 </div>
@@ -1251,7 +990,7 @@
         <h1>Y2K DevWorks</h1>
         <p>Painel Administrativo</p>
       </div>
-      <form onsubmit="login(event)">
+      <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="input-group">
           <label><i class="fas fa-key"></i> Senha de Acesso</label>
           <div class="input-wrapper">
@@ -1260,8 +999,8 @@
             <i class="fas fa-eye password-toggle" onclick="togglePassword()"></i>
           </div>
         </div>
-        <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> Acessar Painel</button>
-        <div class="error-message" id="loginError"><i class="fas fa-exclamation-triangle"></i> Senha incorreta!</div>
+        <button type="submit" class="btn-login" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Acessar Painel</button>
+        <div class="error-message" id="loginError"><i class="fas fa-exclamation-triangle"></i> <span id="loginErrorText">Senha incorreta!</span></div>
       </form>
       <div class="login-footer"><i class="fas fa-shield-alt"></i> Área restrita • Y2K DevWorks</div>
     </div>
@@ -1280,14 +1019,14 @@
       <div class="sidebar-nav">
         <div class="nav-section">
           <div class="nav-section-title">Principal</div>
-          <div class="nav-item active" onclick="showTab('dashboard')"><i class="fas fa-chart-pie"></i><span>Dashboard</span></div>
+          <div class="nav-item active" data-tab="dashboard" onclick="showTab('dashboard')"><i class="fas fa-chart-pie"></i><span>Dashboard</span></div>
         </div>
         <div class="nav-section">
           <div class="nav-section-title">Conteúdo</div>
-          <div class="nav-item" onclick="showTab('hero')"><i class="fas fa-home"></i><span>Hero Section</span></div>
-          <div class="nav-item" onclick="showTab('projetos')"><i class="fas fa-code-branch"></i><span>Projetos</span></div>
-          <div class="nav-item" onclick="showTab('sobre')"><i class="fas fa-user-astronaut"></i><span>Sobre</span></div>
-          <div class="nav-item" onclick="showTab('contato')"><i class="fas fa-address-card"></i><span>Contato</span></div>
+          <div class="nav-item" data-tab="hero" onclick="showTab('hero')"><i class="fas fa-home"></i><span>Hero Section</span></div>
+          <div class="nav-item" data-tab="projetos" onclick="showTab('projetos')"><i class="fas fa-code-branch"></i><span>Projetos</span></div>
+          <div class="nav-item" data-tab="sobre" onclick="showTab('sobre')"><i class="fas fa-user-astronaut"></i><span>Sobre</span></div>
+          <div class="nav-item" data-tab="contato" onclick="showTab('contato')"><i class="fas fa-address-card"></i><span>Contato</span></div>
         </div>
         <div class="nav-section">
           <div class="nav-section-title">Configurações</div>
@@ -1305,144 +1044,98 @@
     
     <!-- Main Content -->
     <div class="main-content">
-      <!-- ===== DASHBOARD COMPLETA ===== -->
+      <!-- Dashboard Panel -->
       <div id="dashboard-panel" class="panel active">
         <div class="top-bar">
-          <div class="page-title">
-            <h1>Dashboard</h1>
-            <p>Visão geral completa do seu site</p>
-          </div>
+          <div class="page-title"><h1>Dashboard</h1><p>Visão geral completa do seu site</p></div>
           <div class="top-actions">
             <div class="status-badge online"><i class="fas fa-circle"></i> Sistema Online</div>
             <button class="btn-action" onclick="window.open('/', '_blank')"><i class="fas fa-external-link-alt"></i> Ver Site</button>
-            <button class="btn-action" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+            <button class="btn-action" onclick="loadContent()"><i class="fas fa-sync-alt"></i> Atualizar</button>
           </div>
         </div>
-        
-        <!-- Stats Cards -->
         <div class="stats-overview" id="dashboard-stats"></div>
-        
-        <!-- Charts Row -->
         <div class="charts-row">
           <div class="chart-card">
-            <div class="chart-header">
-              <h3><i class="fas fa-chart-bar"></i> Visão Geral de Conteúdo</h3>
-              <span style="color: var(--gray-500); font-size: 0.8rem;">Atualizado agora</span>
-            </div>
+            <div class="chart-header"><h3><i class="fas fa-chart-bar"></i> Visão Geral de Conteúdo</h3><span style="color: var(--gray-500); font-size: 0.8rem;">Atualizado agora</span></div>
             <div class="chart-container" id="content-chart"></div>
           </div>
           <div class="chart-card">
-            <div class="chart-header">
-              <h3><i class="fas fa-chart-pie"></i> Distribuição</h3>
-            </div>
+            <div class="chart-header"><h3><i class="fas fa-chart-pie"></i> Distribuição</h3></div>
             <div class="distribution-stats" id="distribution-stats"></div>
           </div>
         </div>
-        
-        <!-- Recent Activity -->
         <div class="activity-card">
-          <div class="activity-header">
-            <h3><i class="fas fa-history"></i> Atividade Recente</h3>
-            <span style="color: var(--gray-500); font-size: 0.8rem;" id="lastUpdateDashboard">Carregando...</span>
-          </div>
-          <div class="activity-list" id="activity-list">
-            <div class="activity-item">
-              <div class="activity-icon"><i class="fas fa-spinner fa-pulse"></i></div>
-              <div class="activity-content">
-                <div class="activity-title">Carregando atividades...</div>
-                <div class="activity-time">Aguarde</div>
-              </div>
-            </div>
-          </div>
+          <div class="activity-header"><h3><i class="fas fa-history"></i> Atividade Recente</h3><span style="color: var(--gray-500); font-size: 0.8rem;" id="lastUpdateDashboard">Carregando...</span></div>
+          <div class="activity-list" id="activity-list"></div>
         </div>
-        
-        <!-- Quick Actions -->
         <div class="quick-actions">
           <div class="quick-action-btn" onclick="showTab('hero')"><i class="fas fa-edit"></i> Editar Hero</div>
           <div class="quick-action-btn" onclick="showTab('projetos')"><i class="fas fa-plus-circle"></i> Adicionar Projeto</div>
           <div class="quick-action-btn" onclick="showTab('contato')"><i class="fas fa-phone"></i> Editar Contatos</div>
         </div>
-        
-        <!-- Info Card -->
-        <div style="margin-top: 25px; padding: 18px; background: rgba(255,0,0,0.03); border: 1px solid var(--border-light); border-radius: 16px;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <i class="fas fa-info-circle" style="color: var(--primary-neon); font-size: 1.5rem;"></i>
-            <div>
-              <strong style="color: white;">Painel Administrativo Y2K DevWorks</strong>
-              <p style="color: var(--gray-400); margin-top: 4px;">Use o menu lateral para navegar entre as seções e editar o conteúdo do site.</p>
-            </div>
-          </div>
-        </div>
       </div>
       
       <!-- Hero Panel -->
       <div id="hero-panel" class="panel">
-        <div class="top-bar">
-          <div class="page-title"><h1>Hero Section</h1><p>Edite a seção principal do site</p></div>
-        </div>
+        <div class="top-bar"><div class="page-title"><h1>Hero Section</h1><p>Edite a seção principal do site</p></div></div>
         <div class="form-card">
           <div class="form-card-header"><h2><i class="fas fa-edit"></i> Editar Hero</h2></div>
           <div class="form-grid">
-            <div class="form-group"><label><i class="fas fa-tag"></i> Badge</label><input type="text" id="hero-badge" placeholder="Y2K_DevWorks // online"></div>
-            <div class="form-group"><label><i class="fas fa-heading"></i> Título Principal</label><input type="text" id="hero-titulo" placeholder="Bots Discord que fazem a diferença"></div>
-            <div class="form-group full-width"><label><i class="fas fa-font"></i> Bio (Monospace)</label><input type="text" id="hero-bio" placeholder="𝙳𝚎𝚜𝚎𝚗𝚟𝚘𝚕𝚟𝚎𝚍𝚘𝚛 𝚍𝚎 𝚜𝚒𝚜𝚝𝚎𝚖𝚊𝚜 𝚙𝚊𝚛𝚊 𝙳𝚒𝚜𝚌𝚘𝚛𝚍"></div>
-            <div class="form-group full-width"><label><i class="fas fa-align-left"></i> Descrição</label><textarea id="hero-descricao" placeholder="Sistemas personalizados para seu servidor Discord..."></textarea></div>
+            <div class="form-group"><label><i class="fas fa-tag"></i> Badge</label><input type="text" id="hero-badge" maxlength="100"></div>
+            <div class="form-group"><label><i class="fas fa-heading"></i> Título</label><input type="text" id="hero-titulo" maxlength="200"></div>
+            <div class="form-group full-width"><label><i class="fas fa-font"></i> Bio</label><input type="text" id="hero-bio" maxlength="500"></div>
+            <div class="form-group full-width"><label><i class="fas fa-align-left"></i> Descrição</label><textarea id="hero-descricao" maxlength="1000"></textarea></div>
           </div>
-          <h3 style="margin: 25px 0 18px; color: white; font-size: 1.2rem;"><i class="fas fa-chart-bar"></i> Estatísticas</h3>
+          <h3 style="margin: 25px 0 18px; color: white;"><i class="fas fa-chart-bar"></i> Estatísticas</h3>
           <div class="form-grid" id="stats-container"></div>
           <button class="btn-save" onclick="saveHero()"><i class="fas fa-save"></i> Salvar Hero Section</button>
-          <div class="success-message" id="hero-success"><i class="fas fa-check-circle"></i> Hero Section salva com sucesso!</div>
+          <div class="success-message" id="hero-success"><i class="fas fa-check-circle"></i> Hero Section salva!</div>
         </div>
       </div>
       
       <!-- Projetos Panel -->
       <div id="projetos-panel" class="panel">
-        <div class="top-bar">
-          <div class="page-title"><h1>Projetos</h1><p>Gerencie os projetos do portfólio</p></div>
-        </div>
+        <div class="top-bar"><div class="page-title"><h1>Projetos</h1><p>Gerencie os projetos do portfólio</p></div></div>
         <div class="form-card">
           <div class="form-card-header"><h2><i class="fas fa-list"></i> Lista de Projetos</h2><span style="color: var(--gray-500);" id="projetos-count">0 projetos</span></div>
           <div class="projects-list" id="projetos-container"></div>
           <button class="btn-add" onclick="addProjeto()"><i class="fas fa-plus-circle"></i> Adicionar Novo Projeto</button>
-          <button class="btn-save" onclick="saveProjetos()"><i class="fas fa-save"></i> Salvar Todos os Projetos</button>
-          <div class="success-message" id="projetos-success"><i class="fas fa-check-circle"></i> Projetos salvos com sucesso!</div>
+          <button class="btn-save" onclick="saveProjetos()"><i class="fas fa-save"></i> Salvar Projetos</button>
+          <div class="success-message" id="projetos-success"><i class="fas fa-check-circle"></i> Projetos salvos!</div>
         </div>
       </div>
       
       <!-- Sobre Panel -->
       <div id="sobre-panel" class="panel">
-        <div class="top-bar">
-          <div class="page-title"><h1>Sobre</h1><p>Edite a seção sobre você</p></div>
-        </div>
+        <div class="top-bar"><div class="page-title"><h1>Sobre</h1><p>Edite a seção sobre você</p></div></div>
         <div class="form-card">
           <div class="form-card-header"><h2><i class="fas fa-user"></i> Informações Pessoais</h2></div>
           <div class="form-grid">
-            <div class="form-group"><label><i class="fas fa-signature"></i> Nome</label><input type="text" id="sobre-nome" placeholder="Isac"></div>
-            <div class="form-group"><label><i class="fas fa-code"></i> Bio (Monospace)</label><input type="text" id="sobre-bio" placeholder="𝙳𝚎𝚜𝚎𝚗𝚟𝚘𝚕𝚟𝚎𝚍𝚘𝚛 𝚍𝚎 𝚜𝚒𝚜𝚝𝚎𝚖𝚊𝚜..."></div>
-            <div class="form-group full-width"><label><i class="fas fa-align-left"></i> Texto Sobre</label><textarea id="sobre-texto" placeholder="Conte sua história..."></textarea></div>
+            <div class="form-group"><label><i class="fas fa-signature"></i> Nome</label><input type="text" id="sobre-nome" maxlength="100"></div>
+            <div class="form-group"><label><i class="fas fa-code"></i> Bio</label><input type="text" id="sobre-bio" maxlength="500"></div>
+            <div class="form-group full-width"><label><i class="fas fa-align-left"></i> Texto</label><textarea id="sobre-texto" maxlength="2000"></textarea></div>
           </div>
-          <h3 style="margin: 25px 0 18px; color: white; font-size: 1.2rem;"><i class="fas fa-tools"></i> Skills</h3>
+          <h3 style="margin: 25px 0 18px; color: white;"><i class="fas fa-tools"></i> Skills</h3>
           <div id="skills-container"></div>
           <button class="btn-save" onclick="saveSobre()"><i class="fas fa-save"></i> Salvar Seção Sobre</button>
-          <div class="success-message" id="sobre-success"><i class="fas fa-check-circle"></i> Seção Sobre salva com sucesso!</div>
+          <div class="success-message" id="sobre-success"><i class="fas fa-check-circle"></i> Sobre salvo!</div>
         </div>
       </div>
       
       <!-- Contato Panel -->
       <div id="contato-panel" class="panel">
-        <div class="top-bar">
-          <div class="page-title"><h1>Contato</h1><p>Edite as informações de contato</p></div>
-        </div>
+        <div class="top-bar"><div class="page-title"><h1>Contato</h1><p>Edite as informações de contato</p></div></div>
         <div class="form-card">
           <div class="form-card-header"><h2><i class="fas fa-address-book"></i> Canais de Contato</h2></div>
           <div class="form-grid">
-            <div class="form-group"><label><i class="fab fa-discord"></i> Discord</label><input type="text" id="contato-discord" placeholder="@Y2k_Nat"></div>
-            <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><input type="email" id="contato-email" placeholder="Y2k_Nat@hotmail.com"></div>
-            <div class="form-group"><label><i class="fas fa-calendar-week"></i> Horário (Seg-Sex)</label><input type="text" id="contato-horario-semana" placeholder="13h às 21h"></div>
-            <div class="form-group"><label><i class="fas fa-calendar-day"></i> Horário (Sáb-Dom)</label><input type="text" id="contato-horario-fim" placeholder="14h às 22h"></div>
+            <div class="form-group"><label><i class="fab fa-discord"></i> Discord</label><input type="text" id="contato-discord" maxlength="100"></div>
+            <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><input type="email" id="contato-email" maxlength="100"></div>
+            <div class="form-group"><label><i class="fas fa-calendar-week"></i> Horário (Seg-Sex)</label><input type="text" id="contato-horario-semana" maxlength="50"></div>
+            <div class="form-group"><label><i class="fas fa-calendar-day"></i> Horário (Sáb-Dom)</label><input type="text" id="contato-horario-fim" maxlength="50"></div>
           </div>
           <button class="btn-save" onclick="saveContato()"><i class="fas fa-save"></i> Salvar Contatos</button>
-          <div class="success-message" id="contato-success"><i class="fas fa-check-circle"></i> Contatos salvos com sucesso!</div>
+          <div class="success-message" id="contato-success"><i class="fas fa-check-circle"></i> Contatos salvos!</div>
         </div>
       </div>
     </div>
@@ -1450,13 +1143,16 @@
 </div>
 
 <!-- Success Toast -->
-<div class="success-message" id="globalSuccess">
-  <i class="fas fa-check-circle"></i>
-  <span id="successMessage">Alterações salvas com sucesso!</span>
-</div>
+<div class="success-message" id="globalSuccess"><i class="fas fa-check-circle"></i> <span id="successMessage">Alterações salvas!</span></div>
 
 <script>
-// ===== DETECÇÃO DE DISPOSITIVO MÓVEL =====
+// ===== CONFIGURAÇÃO =====
+const API_URL = '/api';
+let contentData = {};
+let authToken = localStorage.getItem('admin_token') || '';
+let modalCallback = null;
+
+// ===== DETECÇÃO DE MOBILE =====
 function isMobileDevice() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 }
@@ -1467,44 +1163,94 @@ if (isMobileDevice()) {
   document.getElementById('adminPanel').style.display = 'none';
 }
 
-// ===== VARIÁVEIS GLOBAIS =====
-let contentData = {};
-let adminPassword = '';
-
-if (sessionStorage.getItem('admin_logged') === 'true' && !isMobileDevice()) {
-  showPanel();
-  adminPassword = sessionStorage.getItem('admin_password');
+// ===== VERIFICAR TOKEN EXISTENTE =====
+async function verifyToken() {
+  if (!authToken) return false;
+  try {
+    const res = await fetch(`${API_URL}/verify`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    return res.ok;
+  } catch { return false; }
 }
 
-// ===== FUNÇÕES DE LOGIN =====
+// ===== INICIALIZAÇÃO =====
+(async function init() {
+  if (!isMobileDevice() && authToken) {
+    const isValid = await verifyToken();
+    if (isValid) {
+      showPanel();
+      await loadContent();
+    } else {
+      localStorage.removeItem('admin_token');
+      authToken = '';
+    }
+  }
+})();
+
+// ===== MODAL =====
+function showModal(title, message, onConfirm) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMessage').textContent = message;
+  modalCallback = onConfirm;
+  document.getElementById('confirmModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('active');
+  modalCallback = null;
+}
+
+document.getElementById('modalConfirmBtn').onclick = function() {
+  if (modalCallback) modalCallback();
+  closeModal();
+};
+
+// ===== LOADING =====
+function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
+
+// ===== LOGIN =====
 function togglePassword() {
   const input = document.getElementById('passwordInput');
   input.type = input.type === 'password' ? 'text' : 'password';
 }
 
-async function login(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const password = document.getElementById('passwordInput').value;
+  const btn = document.getElementById('loginBtn');
+  const errorEl = document.getElementById('loginError');
+  const errorText = document.getElementById('loginErrorText');
+  
+  btn.disabled = true;
+  errorEl.style.display = 'none';
+  showLoading();
+  
   try {
-    const res = await fetch('/api/content');
-    const data = await res.json();
-    contentData = data;
-    const testRes = await fetch('/api/save', {
+    const res = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: password, content: contentData })
+      body: JSON.stringify({ password })
     });
-    if (testRes.ok) {
-      adminPassword = password;
-      sessionStorage.setItem('admin_logged', 'true');
-      sessionStorage.setItem('admin_password', password);
+    
+    const data = await res.json();
+    
+    if (res.ok) {
+      authToken = data.token;
+      localStorage.setItem('admin_token', authToken);
       showPanel();
-      loadAllData();
+      await loadContent();
     } else {
-      document.getElementById('loginError').style.display = 'block';
+      errorText.textContent = data.error || 'Senha incorreta!';
+      errorEl.style.display = 'block';
     }
   } catch (error) {
-    showError('Erro ao conectar com o servidor');
+    errorText.textContent = 'Erro de conexão. Tente novamente.';
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    hideLoading();
   }
 }
 
@@ -1514,9 +1260,11 @@ function showPanel() {
 }
 
 function logout() {
-  sessionStorage.removeItem('admin_logged');
-  sessionStorage.removeItem('admin_password');
-  location.reload();
+  showModal('Confirmar Saída', 'Tem certeza que deseja sair do painel?', () => {
+    localStorage.removeItem('admin_token');
+    authToken = '';
+    location.reload();
+  });
 }
 
 // ===== NAVEGAÇÃO =====
@@ -1524,205 +1272,211 @@ function showTab(tab) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(tab + '-panel').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(item => {
-    const onclick = item.getAttribute('onclick');
-    if (onclick && onclick.includes(`'${tab}'`)) item.classList.add('active');
-  });
-  if (tab === 'dashboard') loadDashboard();
-  if (tab === 'projetos') loadProjetos();
-  if (tab === 'hero') loadHero();
-  if (tab === 'sobre') loadSobre();
-  if (tab === 'contato') loadContato();
+  document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
+  
+  const loaders = {
+    dashboard: loadDashboard,
+    projetos: loadProjetos,
+    hero: loadHero,
+    sobre: loadSobre,
+    contato: loadContato
+  };
+  if (loaders[tab]) loaders[tab]();
 }
 
-// ===== CARREGAR DADOS =====
-async function loadAllData() {
-  try {
-    const res = await fetch('/api/content');
-    contentData = await res.json();
-    const now = new Date().toLocaleString('pt-BR');
-    document.getElementById('lastUpdateDashboard').textContent = 'Última atualização: ' + now;
-    if (document.getElementById('dashboard-panel').classList.contains('active')) {
-      loadDashboard();
+// ===== API =====
+async function apiCall(endpoint, options = {}) {
+  const res = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
+      ...options.headers
     }
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Erro na requisição');
+  }
+  return res.json();
+}
+
+async function loadContent() {
+  try {
+    contentData = await apiCall('/content');
+    const now = new Date().toLocaleString('pt-BR');
+    const el = document.getElementById('lastUpdateDashboard');
+    if (el) el.textContent = 'Última atualização: ' + now;
+    if (document.getElementById('dashboard-panel').classList.contains('active')) loadDashboard();
   } catch (error) {
     console.error('Erro ao carregar:', error);
   }
 }
 
+async function saveContent(data, successId) {
+  showLoading();
+  try {
+    const result = await apiCall('/save', {
+      method: 'POST',
+      body: JSON.stringify({ content: data })
+    });
+    contentData = data;
+    showSuccess(successId);
+    await loadContent();
+    return result;
+  } catch (error) {
+    showError(error.message);
+    throw error;
+  } finally {
+    hideLoading();
+  }
+}
+
+// ===== DASHBOARD =====
 function loadDashboard() {
   const projetos = contentData.projetos || [];
   const skills = contentData.sobre?.skills || [];
   const stats = contentData.stats || [];
   
-  // Stats Cards
-  const statsContainer = document.getElementById('dashboard-stats');
-  statsContainer.innerHTML = `
-    <div class="stat-card">
-      <div class="stat-card-header"><i class="fas fa-code-branch"></i></div>
-      <div class="stat-card-value">${projetos.length}</div>
-      <div class="stat-card-label">Projetos Ativos</div>
-      <div class="stat-trend up"><i class="fas fa-arrow-up"></i> +${projetos.length > 0 ? '1' : '0'} este mês</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-header"><i class="fas fa-tools"></i></div>
-      <div class="stat-card-value">${skills.length}</div>
-      <div class="stat-card-label">Skills Cadastradas</div>
-      <div class="stat-trend up"><i class="fas fa-check"></i> Atualizado</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-header"><i class="fas fa-users"></i></div>
-      <div class="stat-card-value">${stats[0]?.valor || 0}+</div>
-      <div class="stat-card-label">${stats[0]?.label || 'Usuários'}</div>
-      <div class="stat-trend up"><i class="fas fa-arrow-up"></i> +12% crescimento</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-header"><i class="fas fa-calendar"></i></div>
-      <div class="stat-card-value">${stats[1]?.valor || 1}</div>
-      <div class="stat-card-label">${stats[1]?.label || 'Ano de XP'}</div>
-      <div class="stat-trend"><i class="fas fa-minus"></i> Estável</div>
-    </div>
+  document.getElementById('dashboard-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-code-branch"></i></div><div class="stat-card-value">${projetos.length}</div><div class="stat-card-label">Projetos</div><div class="stat-trend up"><i class="fas fa-arrow-up"></i> Ativos</div></div>
+    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-tools"></i></div><div class="stat-card-value">${skills.length}</div><div class="stat-card-label">Skills</div><div class="stat-trend up"><i class="fas fa-check"></i> Configuradas</div></div>
+    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-users"></i></div><div class="stat-card-value">${stats[0]?.valor || 0}+</div><div class="stat-card-label">${stats[0]?.label || 'Usuários'}</div><div class="stat-trend up"><i class="fas fa-arrow-up"></i> +12%</div></div>
+    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-calendar"></i></div><div class="stat-card-value">${stats[1]?.valor || 1}</div><div class="stat-card-label">${stats[1]?.label || 'Ano'}</div><div class="stat-trend"><i class="fas fa-minus"></i> Estável</div></div>
   `;
   
-  // Content Chart
-  const chartContainer = document.getElementById('content-chart');
-  const maxProjetos = Math.max(projetos.length, 1);
-  const chartData = [
+  const maxVal = Math.max(projetos.length, skills.length, stats.length, 1);
+  document.getElementById('content-chart').innerHTML = [
     { label: 'Projetos', value: projetos.length, color: 'var(--primary)' },
     { label: 'Skills', value: skills.length, color: 'var(--purple)' },
     { label: 'Stats', value: stats.length, color: 'var(--info)' }
-  ];
-  chartContainer.innerHTML = chartData.map(d => `
-    <div class="chart-bar-container">
-      <div class="chart-value">${d.value}</div>
-      <div class="chart-bar" style="height: ${(d.value / maxProjetos) * 120}px; background: linear-gradient(180deg, ${d.color}, ${d.color}dd);"></div>
-      <div class="chart-label">${d.label}</div>
-    </div>
-  `).join('');
+  ].map(d => `<div class="chart-bar-container"><div class="chart-value">${d.value}</div><div class="chart-bar" style="height: ${(d.value/maxVal)*120}px; background: ${d.color};"></div><div class="chart-label">${d.label}</div></div>`).join('');
   
-  // Distribution Stats
-  const distContainer = document.getElementById('distribution-stats');
   const total = projetos.length + skills.length + stats.length || 1;
-  distContainer.innerHTML = `
-    <div class="dist-item">
-      <i class="fas fa-code-branch" style="color: var(--primary); width: 24px;"></i>
-      <div class="dist-info">
-        <div class="dist-header"><span class="dist-name">Projetos</span><span class="dist-value">${projetos.length}</span></div>
-        <div class="dist-bar"><div class="dist-progress" style="width: ${(projetos.length/total)*100}%; background: var(--primary);"></div></div>
-      </div>
-    </div>
-    <div class="dist-item">
-      <i class="fas fa-tools" style="color: var(--purple); width: 24px;"></i>
-      <div class="dist-info">
-        <div class="dist-header"><span class="dist-name">Skills</span><span class="dist-value">${skills.length}</span></div>
-        <div class="dist-bar"><div class="dist-progress" style="width: ${(skills.length/total)*100}%; background: var(--purple);"></div></div>
-      </div>
-    </div>
-    <div class="dist-item">
-      <i class="fas fa-chart-bar" style="color: var(--info); width: 24px;"></i>
-      <div class="dist-info">
-        <div class="dist-header"><span class="dist-name">Estatísticas</span><span class="dist-value">${stats.length}</span></div>
-        <div class="dist-bar"><div class="dist-progress" style="width: ${(stats.length/total)*100}%; background: var(--info);"></div></div>
-      </div>
-    </div>
+  document.getElementById('distribution-stats').innerHTML = `
+    <div class="dist-item"><i class="fas fa-code-branch" style="color: var(--primary); width: 24px;"></i><div class="dist-info"><div class="dist-header"><span class="dist-name">Projetos</span><span class="dist-value">${projetos.length}</span></div><div class="dist-bar"><div class="dist-progress" style="width: ${(projetos.length/total)*100}%; background: var(--primary);"></div></div></div></div>
+    <div class="dist-item"><i class="fas fa-tools" style="color: var(--purple); width: 24px;"></i><div class="dist-info"><div class="dist-header"><span class="dist-name">Skills</span><span class="dist-value">${skills.length}</span></div><div class="dist-bar"><div class="dist-progress" style="width: ${(skills.length/total)*100}%; background: var(--purple);"></div></div></div></div>
+    <div class="dist-item"><i class="fas fa-chart-bar" style="color: var(--info); width: 24px;"></i><div class="dist-info"><div class="dist-header"><span class="dist-name">Stats</span><span class="dist-value">${stats.length}</span></div><div class="dist-bar"><div class="dist-progress" style="width: ${(stats.length/total)*100}%; background: var(--info);"></div></div></div></div>
   `;
   
-  // Activity List
-  const activityList = document.getElementById('activity-list');
-  activityList.innerHTML = `
-    <div class="activity-item">
-      <div class="activity-icon"><i class="fas fa-check-circle" style="color: var(--success);"></i></div>
-      <div class="activity-content"><div class="activity-title">Sistema online e funcionando</div><div class="activity-time">Agora mesmo</div></div>
-    </div>
-    <div class="activity-item">
-      <div class="activity-icon"><i class="fas fa-database"></i></div>
-      <div class="activity-content"><div class="activity-title">${projetos.length} projetos cadastrados</div><div class="activity-time">Total no portfólio</div></div>
-    </div>
-    <div class="activity-item">
-      <div class="activity-icon"><i class="fas fa-code"></i></div>
-      <div class="activity-content"><div class="activity-title">${skills.length} skills configuradas</div><div class="activity-time">JavaScript, Python, HTML...</div></div>
-    </div>
-    <div class="activity-item">
-      <div class="activity-icon"><i class="fas fa-clock"></i></div>
-      <div class="activity-content"><div class="activity-title">Horário de atendimento ativo</div><div class="activity-time">${contentData.contato?.horario_semana || '13h às 21h'}</div></div>
-    </div>
+  document.getElementById('activity-list').innerHTML = `
+    <div class="activity-item"><div class="activity-icon"><i class="fas fa-check-circle" style="color: var(--success);"></i></div><div class="activity-content"><div class="activity-title">Sistema online</div><div class="activity-time">Agora mesmo</div></div></div>
+    <div class="activity-item"><div class="activity-icon"><i class="fas fa-database"></i></div><div class="activity-content"><div class="activity-title">${projetos.length} projetos</div><div class="activity-time">Total no portfólio</div></div></div>
+    <div class="activity-item"><div class="activity-icon"><i class="fas fa-code"></i></div><div class="activity-content"><div class="activity-title">${skills.length} skills</div><div class="activity-time">${skills.slice(0,3).join(', ')}${skills.length>3?'...':''}</div></div></div>
   `;
 }
 
+// ===== HERO =====
 function loadHero() {
-  document.getElementById('hero-badge').value = contentData.hero?.badge || '';
-  document.getElementById('hero-titulo').value = contentData.hero?.titulo || '';
-  document.getElementById('hero-bio').value = contentData.hero?.bio || '';
-  document.getElementById('hero-descricao').value = contentData.hero?.descricao || '';
-  const statsContainer = document.getElementById('stats-container');
-  statsContainer.innerHTML = (contentData.stats || []).map((s, i) => `
-    <div class="form-group"><label>Stat ${i + 1} - Valor</label><input type="number" id="stat${i}-valor" value="${s.valor}"></div>
-    <div class="form-group"><label>Stat ${i + 1} - Label</label><input type="text" id="stat${i}-label" value="${s.label}"></div>
+  const h = contentData.hero || {};
+  document.getElementById('hero-badge').value = h.badge || '';
+  document.getElementById('hero-titulo').value = h.titulo || '';
+  document.getElementById('hero-bio').value = h.bio || '';
+  document.getElementById('hero-descricao').value = h.descricao || '';
+  
+  const stats = contentData.stats || [];
+  document.getElementById('stats-container').innerHTML = stats.map((s, i) => `
+    <div class="form-group"><label>Stat ${i+1} - Valor</label><input type="number" id="stat${i}-valor" value="${s.valor}"></div>
+    <div class="form-group"><label>Stat ${i+1} - Label</label><input type="text" id="stat${i}-label" value="${s.label}" maxlength="50"></div>
   `).join('');
 }
 
+async function saveHero() {
+  contentData.hero = {
+    badge: document.getElementById('hero-badge').value.trim(),
+    titulo: document.getElementById('hero-titulo').value.trim(),
+    bio: document.getElementById('hero-bio').value.trim(),
+    descricao: document.getElementById('hero-descricao').value.trim()
+  };
+  contentData.stats = contentData.stats.map((_, i) => ({
+    valor: parseInt(document.getElementById(`stat${i}-valor`).value) || 0,
+    label: document.getElementById(`stat${i}-label`).value.trim()
+  }));
+  await saveContent(contentData, 'hero-success');
+}
+
+// ===== PROJETOS =====
 function loadProjetos() {
   const projetos = contentData.projetos || [];
   document.getElementById('projetos-count').textContent = `${projetos.length} projetos`;
-  document.getElementById('projetos-container').innerHTML = projetos.map((p, i) => `
-    <div class="project-item-card">
+  
+  const container = document.getElementById('projetos-container');
+  container.innerHTML = projetos.map((p, i) => `
+    <div class="project-item-card" data-projeto-id="${p.id || i}">
       <div class="project-item-header">
-        <div class="project-item-title"><i class="fas ${p.icone || 'fa-code'}"></i><h3>${p.nome || 'Novo Projeto'}</h3></div>
+        <div class="project-item-title"><i class="fas ${p.icone || 'fa-code'}"></i><h3>${p.nome || 'Novo'}</h3></div>
         <div class="project-actions">
-          <button class="btn-icon" onclick="moveProjeto(${i}, 'up')" ${i === 0 ? 'disabled' : ''}><i class="fas fa-chevron-up"></i></button>
-          <button class="btn-icon" onclick="moveProjeto(${i}, 'down')" ${i === projetos.length - 1 ? 'disabled' : ''}><i class="fas fa-chevron-down"></i></button>
-          <button class="btn-icon danger" onclick="removeProjeto(${i})"><i class="fas fa-trash"></i></button>
+          <button class="btn-icon" onclick="moveProjeto(${i}, 'up')" ${i===0?'disabled':''}><i class="fas fa-chevron-up"></i></button>
+          <button class="btn-icon" onclick="moveProjeto(${i}, 'down')" ${i===projetos.length-1?'disabled':''}><i class="fas fa-chevron-down"></i></button>
+          <button class="btn-icon danger" onclick="confirmRemoveProjeto(${i})"><i class="fas fa-trash"></i></button>
         </div>
       </div>
       <div class="project-item-fields">
-        <div class="form-group"><label>Nome</label><input type="text" id="proj-nome-${i}" value="${p.nome || ''}"></div>
-        <div class="form-group"><label>Tipo</label><input type="text" id="proj-tipo-${i}" value="${p.tipo || ''}"></div>
-        <div class="form-group"><label>Ícone</label><input type="text" id="proj-icone-${i}" value="${p.icone || 'fa-code'}"></div>
-        <div class="form-group full-width"><label>Descrição</label><textarea id="proj-desc-${i}">${p.descricao || ''}</textarea></div>
+        <div class="form-group"><label>Nome</label><input type="text" id="proj-nome-${i}" value="${p.nome || ''}" maxlength="100"></div>
+        <div class="form-group"><label>Tipo</label><input type="text" id="proj-tipo-${i}" value="${p.tipo || ''}" maxlength="100"></div>
+        <div class="form-group"><label>Ícone</label><input type="text" id="proj-icone-${i}" value="${p.icone || 'fa-code'}" maxlength="50"></div>
+        <div class="form-group full-width"><label>Descrição</label><textarea id="proj-desc-${i}" maxlength="500">${p.descricao || ''}</textarea></div>
       </div>
     </div>
   `).join('');
 }
 
-function loadSobre() {
-  document.getElementById('sobre-nome').value = contentData.sobre?.nome || '';
-  document.getElementById('sobre-bio').value = contentData.sobre?.bio || '';
-  document.getElementById('sobre-texto').value = contentData.sobre?.texto || '';
-  const skills = contentData.sobre?.skills || [];
-  document.getElementById('skills-container').innerHTML = `
-    <div class="skills-input-container" id="skills-list">
-      ${skills.map((s, i) => `<span class="skill-tag-input">${s}<i class="fas fa-times" onclick="removeSkill(${i})"></i></span>`).join('')}
-      <button class="btn-add-skill" onclick="addSkill()"><i class="fas fa-plus"></i> Adicionar Skill</button>
-    </div>
-  `;
-}
-
-function loadContato() {
-  document.getElementById('contato-discord').value = contentData.contato?.discord || '';
-  document.getElementById('contato-email').value = contentData.contato?.email || '';
-  document.getElementById('contato-horario-semana').value = contentData.contato?.horario_semana || '';
-  document.getElementById('contato-horario-fim').value = contentData.contato?.horario_fim || '';
-}
-
-// ===== FUNÇÕES DE MANIPULAÇÃO =====
 function addProjeto() {
   if (!contentData.projetos) contentData.projetos = [];
-  contentData.projetos.push({ nome: 'Novo Projeto', tipo: 'Tipo', descricao: 'Descrição', icone: 'fa-code' });
+  contentData.projetos.push({
+    id: 'proj_' + Date.now() + '_' + Math.random().toString(36),
+    nome: 'Novo Projeto',
+    tipo: 'Tipo',
+    descricao: 'Descrição',
+    icone: 'fa-code'
+  });
   loadProjetos();
 }
 
-function removeProjeto(index) {
-  if (confirm('Remover este projeto?')) {
+function confirmRemoveProjeto(index) {
+  showModal('Remover Projeto', 'Tem certeza que deseja remover este projeto? Esta ação não pode ser desfeita.', () => {
     contentData.projetos.splice(index, 1);
     loadProjetos();
-  }
+  });
 }
 
 function moveProjeto(index, direction) {
-  const projetos = contentData.projetos;
-  if (direction === 'up' && index > 0) [projetos[index - 1], projetos[index]] = [projetos[index], projetos[index - 1]];
-  else if (direction === 'down' && index < projetos.length - 1) [projetos[index], projetos[index + 1]] = [projetos[index + 1], projetos[index]];
+  const arr = contentData.projetos;
+  if (direction === 'up' && index > 0) [arr[index-1], arr[index]] = [arr[index], arr[index-1]];
+  else if (direction === 'down' && index < arr.length-1) [arr[index], arr[index+1]] = [arr[index+1], arr[index]];
   loadProjetos();
+}
+
+async function saveProjetos() {
+  const projetos = [];
+  document.querySelectorAll('.project-item-card').forEach((card, i) => {
+    const id = contentData.projetos[i]?.id || 'proj_' + Date.now() + '_' + i;
+    projetos.push({
+      id: id,
+      nome: document.getElementById(`proj-nome-${i}`)?.value.trim() || '',
+      tipo: document.getElementById(`proj-tipo-${i}`)?.value.trim() || '',
+      descricao: document.getElementById(`proj-desc-${i}`)?.value.trim() || '',
+      icone: document.getElementById(`proj-icone-${i}`)?.value.trim() || 'fa-code'
+    });
+  });
+  contentData.projetos = projetos;
+  await saveContent(contentData, 'projetos-success');
+}
+
+// ===== SOBRE =====
+function loadSobre() {
+  const s = contentData.sobre || {};
+  document.getElementById('sobre-nome').value = s.nome || '';
+  document.getElementById('sobre-bio').value = s.bio || '';
+  document.getElementById('sobre-texto').value = s.texto || '';
+  
+  const skills = s.skills || [];
+  document.getElementById('skills-container').innerHTML = `
+    <div class="skills-input-container" id="skills-list">
+      ${skills.map((sk, i) => `<span class="skill-tag-input">${sk}<i class="fas fa-times" onclick="removeSkill(${i})"></i></span>`).join('')}
+      <button class="btn-add-skill" onclick="addSkill()"><i class="fas fa-plus"></i> Adicionar Skill</button>
+    </div>
+  `;
 }
 
 function addSkill() {
@@ -1739,92 +1493,50 @@ function removeSkill(index) {
   loadSobre();
 }
 
-// ===== FUNÇÕES DE SALVAR =====
-async function saveData(data, successId) {
-  try {
-    const res = await fetch('/api/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: adminPassword, content: data })
-    });
-    if (res.ok) {
-      contentData = data;
-      showSuccess(successId);
-      loadAllData();
-    } else showError('Erro ao salvar.');
-  } catch (error) { showError('Erro: ' + error.message); }
-}
-
-function saveHero() {
-  contentData.hero = {
-    badge: document.getElementById('hero-badge').value,
-    titulo: document.getElementById('hero-titulo').value,
-    bio: document.getElementById('hero-bio').value,
-    descricao: document.getElementById('hero-descricao').value
+async function saveSobre() {
+  contentData.sobre = {
+    ...contentData.sobre,
+    nome: document.getElementById('sobre-nome').value.trim(),
+    bio: document.getElementById('sobre-bio').value.trim(),
+    texto: document.getElementById('sobre-texto').value.trim()
   };
-  contentData.stats = contentData.stats.map((_, i) => ({
-    valor: parseInt(document.getElementById(`stat${i}-valor`).value) || 0,
-    label: document.getElementById(`stat${i}-label`).value
-  }));
-  saveData(contentData, 'hero-success');
+  await saveContent(contentData, 'sobre-success');
 }
 
-function saveProjetos() {
-  const projetos = [];
-  document.querySelectorAll('.project-item-card').forEach((item, i) => {
-    projetos.push({
-      nome: document.getElementById(`proj-nome-${i}`)?.value || '',
-      tipo: document.getElementById(`proj-tipo-${i}`)?.value || '',
-      descricao: document.getElementById(`proj-desc-${i}`)?.value || '',
-      icone: document.getElementById(`proj-icone-${i}`)?.value || 'fa-code'
-    });
-  });
-  contentData.projetos = projetos;
-  saveData(contentData, 'projetos-success');
+// ===== CONTATO =====
+function loadContato() {
+  const c = contentData.contato || {};
+  document.getElementById('contato-discord').value = c.discord || '';
+  document.getElementById('contato-email').value = c.email || '';
+  document.getElementById('contato-horario-semana').value = c.horario_semana || '';
+  document.getElementById('contato-horario-fim').value = c.horario_fim || '';
 }
 
-function saveSobre() {
-  contentData.sobre = { ...contentData.sobre,
-    nome: document.getElementById('sobre-nome').value,
-    bio: document.getElementById('sobre-bio').value,
-    texto: document.getElementById('sobre-texto').value
-  };
-  saveData(contentData, 'sobre-success');
-}
-
-function saveContato() {
+async function saveContato() {
   contentData.contato = {
-    discord: document.getElementById('contato-discord').value,
-    email: document.getElementById('contato-email').value,
-    horario_semana: document.getElementById('contato-horario-semana').value,
-    horario_fim: document.getElementById('contato-horario-fim').value
+    discord: document.getElementById('contato-discord').value.trim(),
+    email: document.getElementById('contato-email').value.trim().toLowerCase(),
+    horario_semana: document.getElementById('contato-horario-semana').value.trim(),
+    horario_fim: document.getElementById('contato-horario-fim').value.trim()
   };
-  saveData(contentData, 'contato-success');
+  await saveContent(contentData, 'contato-success');
 }
 
 // ===== UI HELPERS =====
-function showSuccess(successId) {
-  const el = document.getElementById(successId);
-  el.style.display = 'flex';
-  setTimeout(() => el.style.display = 'none', 3000);
+function showSuccess(id) {
+  const el = document.getElementById(id);
+  if (el) { el.style.display = 'flex'; setTimeout(() => el.style.display = 'none', 3000); }
 }
 
-function showError(message) {
+function showError(msg) {
   const el = document.getElementById('globalSuccess');
   el.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1))';
   el.style.borderColor = 'var(--danger)';
   el.style.color = 'var(--danger)';
-  document.getElementById('successMessage').textContent = message;
+  document.getElementById('successMessage').textContent = msg;
   el.style.display = 'flex';
   setTimeout(() => { el.style.display = 'none'; el.style.background = ''; el.style.borderColor = ''; el.style.color = ''; }, 4000);
 }
-
-// ===== INICIAR =====
-if (!isMobileDevice()) {
-  loadAllData();
-  setInterval(loadAllData, 30000);
-}
 </script>
-
 </body>
 </html>
