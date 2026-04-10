@@ -28,7 +28,7 @@ initPasswordHash();
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json({ limit: '50mb' })); // Aumentado para receber listas grandes
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
 
 // ===== MIDDLEWARE DE AUTENTICAÇÃO JWT =====
@@ -164,7 +164,7 @@ app.get('/api/verify', authenticateToken, (req, res) => {
   });
 });
 
-// ===== DADOS DOS BOTS (COM IDs DE SERVIDORES E USUÁRIOS) =====
+// ===== DADOS DO BOT (APENAS INSIGHT) =====
 const botsData = {
   insight: {
     id: 'insight',
@@ -182,44 +182,10 @@ const botsData = {
     ultimaAtualizacao: null,
     token: process.env.INSIGHT_TOKEN || 'INSIGHT_TOKEN_123',
     descricao: 'Sistema de sugestões com votação e análise de engajamento'
-  },
-  atlas: {
-    id: 'atlas',
-    nome: 'Atlas',
-    avatar: 'fa-building',
-    status: 'offline',
-    servidores: 0,
-    guildIds: [],
-    usuarios: 0,
-    userIds: [],
-    comandos: 0,
-    ping: 0,
-    uptime: '0%',
-    versao: '1.5.2',
-    ultimaAtualizacao: null,
-    token: process.env.ATLAS_TOKEN || 'ATLAS_TOKEN_456',
-    descricao: 'Sistema de registro e gerenciamento de imóveis para servidores RP'
-  },
-  vehix: {
-    id: 'vehix',
-    nome: 'Vehix',
-    avatar: 'fa-car',
-    status: 'offline',
-    servidores: 0,
-    guildIds: [],
-    usuarios: 0,
-    userIds: [],
-    comandos: 0,
-    ping: 0,
-    uptime: '0%',
-    versao: '1.2.0',
-    ultimaAtualizacao: null,
-    token: process.env.VEHIX_TOKEN || 'VEHIX_TOKEN_789',
-    descricao: 'Sistema completo de registro e controle de veículos'
   }
 };
 
-// ===== FUNÇÕES PARA CALCULAR TOTAIS ÚNICOS (100% PRECISO) =====
+// ===== FUNÇÕES PARA CALCULAR TOTAIS ÚNICOS =====
 function calcularServidoresUnicos() {
   const todosIds = new Set();
   
@@ -244,7 +210,7 @@ function calcularUsuariosUnicos() {
   return todosIds.size;
 }
 
-// ===== ENDPOINT PARA OS BOTS ATUALIZAREM SEU STATUS (HEARTBEAT) =====
+// ===== ENDPOINT PARA O BOT ATUALIZAR SEU STATUS (HEARTBEAT) =====
 app.post('/api/bot/heartbeat', (req, res) => {
   const { botId, token, status, servidores, guildIds, usuarios, userIds, comandos, ping, uptime, versao } = req.body;
   
@@ -273,20 +239,12 @@ app.post('/api/bot/heartbeat', (req, res) => {
   
   bot.ultimaAtualizacao = new Date().toISOString();
   
-  const servidoresUnicos = calcularServidoresUnicos();
-  const usuariosUnicos = calcularUsuariosUnicos();
-  
   console.log(`📡 Heartbeat recebido: ${bot.nome} - Status: ${bot.status}, Servidores: ${bot.servidores}, Usuários: ${bot.usuarios}`);
-  console.log(`   📊 Total ÚNICO: ${servidoresUnicos} servidores, ${usuariosUnicos} usuários`);
   
   res.json({
     success: true,
     message: 'Status atualizado com sucesso!',
-    receivedAt: new Date().toISOString(),
-    stats: {
-      servidoresUnicos: servidoresUnicos,
-      usuariosUnicos: usuariosUnicos
-    }
+    receivedAt: new Date().toISOString()
   });
 });
 
@@ -307,37 +265,14 @@ app.get('/api/bots', authenticateToken, (req, res) => {
     descricao: bot.descricao
   }));
   
-  const servidoresUnicos = calcularServidoresUnicos();
-  const usuariosUnicos = calcularUsuariosUnicos();
-  
   res.json({
     success: true,
     bots: bots,
     totalBots: bots.length,
     botsOnline: bots.filter(b => b.status === 'online').length,
-    totalServidores: servidoresUnicos,
-    totalUsuarios: usuariosUnicos,
+    totalServidores: calcularServidoresUnicos(),
+    totalUsuarios: calcularUsuariosUnicos(),
     updatedAt: new Date().toISOString()
-  });
-});
-
-// ===== API PARA VER ESTATÍSTICAS DETALHADAS (DEBUG) =====
-app.get('/api/bots/debug', authenticateToken, (req, res) => {
-  const bots = Object.values(botsData).map(bot => ({
-    id: bot.id,
-    nome: bot.nome,
-    status: bot.status,
-    servidores: bot.servidores,
-    guildIdsCount: bot.guildIds?.length || 0,
-    usuarios: bot.usuarios,
-    userIdsCount: bot.userIds?.length || 0
-  }));
-  
-  res.json({
-    success: true,
-    bots: bots,
-    servidoresUnicos: calcularServidoresUnicos(),
-    usuariosUnicos: calcularUsuariosUnicos()
   });
 });
 
@@ -352,13 +287,11 @@ function getDefaultContent() {
     },
     stats: [
       { valor: 150, label: "Usuários Ajudados" },
-      { valor: 3, label: "Projetos Ativos" },
+      { valor: 1, label: "Projetos Ativos" },
       { valor: 1, label: "Ano de XP" }
     ],
     projetos: [
-      { id: "proj_1", nome: "Insight", tipo: "Sistema de Sugestões", descricao: "Sistema completo de sugestões com votação.", icone: "fa-lightbulb" },
-      { id: "proj_2", nome: "Atlas", tipo: "Registro de Imóveis", descricao: "Sistema de registro de propriedades para RP.", icone: "fa-building" },
-      { id: "proj_3", nome: "Vehix", tipo: "Registro de Veículos", descricao: "Sistema completo de registro de veículos.", icone: "fa-car" }
+      { id: "proj_1", nome: "Insight", tipo: "Sistema de Sugestões", descricao: "Sistema completo de sugestões com votação.", icone: "fa-lightbulb" }
     ],
     sobre: {
       nome: "Isac",
@@ -425,9 +358,7 @@ function sanitizeContent(content) {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log(`🔐 JWT configurado com segurança`);
-  console.log(`🤖 Monitor de Bots ativo (${Object.keys(botsData).length} bots)`);
+  console.log(`🤖 Monitor de Bots ativo (${Object.keys(botsData).length} bot) - APENAS INSIGHT`);
   console.log(`📡 Endpoint Heartbeat: POST /api/bot/heartbeat`);
-  console.log(`✅ Servidores ÚNICOS (via IDs) - 100% PRECISO!`);
-  console.log(`✅ Usuários ÚNICOS (via IDs) - 100% PRECISO!`);
   console.log(`📁 Diretório: ${__dirname}`);
 });
