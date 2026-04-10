@@ -644,6 +644,148 @@
     .status-badge.online { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
     .status-badge i { font-size: 0.6rem; }
 
+    /* ===== BOTS LIST ===== */
+    .bots-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+    }
+
+    .bot-card {
+      background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(10, 10, 10, 0.9));
+      border: 1.5px solid var(--border-light);
+      border-radius: 20px;
+      padding: 25px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bot-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 40px rgba(255, 0, 0, 0.2);
+    }
+
+    .bot-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .bot-avatar {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.05));
+      border: 2px solid var(--border-medium);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--primary-neon);
+    }
+
+    .bot-info h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 5px;
+    }
+
+    .bot-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .bot-status.online {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .bot-status.manutencao {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .bot-status.offline {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .bot-status i {
+      font-size: 0.5rem;
+    }
+
+    .bot-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .bot-detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .bot-detail-label {
+      color: var(--gray-500);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .bot-detail-value {
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .bot-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .bot-version {
+      color: var(--gray-500);
+      font-size: 0.75rem;
+    }
+
+    .btn-refresh-bot {
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      color: var(--gray-400);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-refresh-bot:hover {
+      background: rgba(255, 0, 0, 0.08);
+      border-color: var(--primary);
+      color: var(--primary-light);
+    }
+
     /* Form Cards */
     .form-card {
       background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(10, 10, 10, 0.9));
@@ -810,6 +952,7 @@
       .form-grid { grid-template-columns: 1fr; }
       .form-group.full-width { grid-column: span 1; }
       .project-item-fields { grid-template-columns: 1fr; }
+      .bots-list { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -852,7 +995,7 @@
   </div>
 </div>
 
-<!-- ===== TELA DE LOGIN (CORRIGIDA) ===== -->
+<!-- ===== TELA DE LOGIN ===== -->
 <div id="loginScreen">
   <div class="login-container">
     <div class="login-box">
@@ -898,6 +1041,10 @@
           <div class="nav-item" data-tab="projetos" onclick="showTab('projetos')"><i class="fas fa-code-branch"></i><span>Projetos</span></div>
           <div class="nav-item" data-tab="sobre" onclick="showTab('sobre')"><i class="fas fa-user-astronaut"></i><span>Sobre</span></div>
           <div class="nav-item" data-tab="contato" onclick="showTab('contato')"><i class="fas fa-address-card"></i><span>Contato</span></div>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Monitoramento</div>
+          <div class="nav-item" data-tab="bots" onclick="showTab('bots')"><i class="fas fa-robot"></i><span>Meus Bots</span></div>
         </div>
         <div class="nav-section">
           <div class="nav-section-title">Configurações</div>
@@ -1008,6 +1155,37 @@
           <button class="btn-save" onclick="saveContato()"><i class="fas fa-save"></i> Salvar Contatos</button>
           <div class="success-message" id="contato-success"><i class="fas fa-check-circle"></i> Contatos salvos!</div>
         </div>
+      </div>
+      
+      <!-- Bots Panel -->
+      <div id="bots-panel" class="panel">
+        <div class="top-bar">
+          <div class="page-title">
+            <h1>Monitor de Bots</h1>
+            <p>Acompanhe o status dos seus bots</p>
+          </div>
+          <div class="top-actions">
+            <button class="btn-action" onclick="loadBots()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+          </div>
+        </div>
+        
+        <div class="stats-overview" id="bots-stats"></div>
+        
+        <div class="form-card">
+          <div class="form-card-header">
+            <h2><i class="fas fa-robot"></i> Bots Ativos</h2>
+            <span style="color: var(--gray-500);" id="bots-count">0 bots</span>
+          </div>
+          <div class="bots-list" id="bots-container"></div>
+        </div>
+        
+        <div style="display: flex; gap: 20px; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: var(--success); border-radius: 50%;"></span> Online</div>
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: var(--warning); border-radius: 50%;"></span> Manutenção</div>
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: var(--danger); border-radius: 50%;"></span> Offline</div>
+        </div>
+        
+        <div class="success-message" id="bots-success"><i class="fas fa-check-circle"></i> Bots atualizados!</div>
       </div>
     </div>
   </div>
@@ -1159,7 +1337,8 @@ function showTab(tab) {
     projetos: loadProjetos,
     hero: loadHero,
     sobre: loadSobre,
-    contato: loadContato
+    contato: loadContato,
+    bots: loadBots
   };
   if (loaders[tab]) loaders[tab]();
 }
@@ -1400,6 +1579,113 @@ async function saveContato() {
     horario_fim: document.getElementById('contato-horario-fim').value.trim()
   };
   await saveContent(contentData, 'contato-success');
+}
+
+// ===== BOTS =====
+let botsData = {};
+
+async function loadBots() {
+  showLoading();
+  try {
+    const data = await apiCall('/bots');
+    botsData = data;
+    renderBots();
+    showSuccess('bots-success');
+  } catch (error) {
+    showError('Erro ao carregar bots');
+  } finally {
+    hideLoading();
+  }
+}
+
+function renderBots() {
+  const statsContainer = document.getElementById('bots-stats');
+  statsContainer.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-card-header"><i class="fas fa-robot"></i></div>
+      <div class="stat-card-value">${botsData.totalBots || 0}</div>
+      <div class="stat-card-label">Total de Bots</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-header"><i class="fas fa-circle" style="color: var(--success);"></i></div>
+      <div class="stat-card-value">${botsData.botsOnline || 0}</div>
+      <div class="stat-card-label">Bots Online</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-header"><i class="fas fa-server"></i></div>
+      <div class="stat-card-value">${botsData.totalServidores || 0}</div>
+      <div class="stat-card-label">Servidores</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-header"><i class="fas fa-users"></i></div>
+      <div class="stat-card-value">${(botsData.totalUsuarios || 0).toLocaleString()}</div>
+      <div class="stat-card-label">Usuários</div>
+    </div>
+  `;
+  
+  const bots = botsData.bots || [];
+  document.getElementById('bots-count').textContent = `${bots.length} bots`;
+  
+  const container = document.getElementById('bots-container');
+  container.innerHTML = bots.map(bot => {
+    const statusClass = bot.status === 'online' ? 'online' : bot.status === 'manutencao' ? 'manutencao' : 'offline';
+    const statusText = bot.status === 'online' ? 'Online' : bot.status === 'manutencao' ? 'Manutenção' : 'Offline';
+    
+    return `
+      <div class="bot-card">
+        <div class="bot-header">
+          <div class="bot-avatar"><i class="fas ${bot.avatar}"></i></div>
+          <div class="bot-info">
+            <h3>${bot.nome}</h3>
+            <span class="bot-status ${statusClass}"><i class="fas fa-circle"></i> ${statusText}</span>
+          </div>
+        </div>
+        <div class="bot-details">
+          <div class="bot-detail-item">
+            <span class="bot-detail-label"><i class="fas fa-server"></i> Servidores</span>
+            <span class="bot-detail-value">${bot.servidores}</span>
+          </div>
+          <div class="bot-detail-item">
+            <span class="bot-detail-label"><i class="fas fa-users"></i> Usuários</span>
+            <span class="bot-detail-value">${bot.usuarios.toLocaleString()}</span>
+          </div>
+          <div class="bot-detail-item">
+            <span class="bot-detail-label"><i class="fas fa-terminal"></i> Comandos</span>
+            <span class="bot-detail-value">${bot.comandos}</span>
+          </div>
+          <div class="bot-detail-item">
+            <span class="bot-detail-label"><i class="fas fa-clock"></i> Ping</span>
+            <span class="bot-detail-value">${bot.ping}ms</span>
+          </div>
+          <div class="bot-detail-item">
+            <span class="bot-detail-label"><i class="fas fa-chart-line"></i> Uptime</span>
+            <span class="bot-detail-value">${bot.uptime}</span>
+          </div>
+        </div>
+        <div class="bot-footer">
+          <span class="bot-version"><i class="fas fa-code-branch"></i> v${bot.versao}</span>
+          <button class="btn-refresh-bot" onclick="refreshBot('${bot.id}')">
+            <i class="fas fa-sync-alt"></i> Atualizar
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function refreshBot(botId) {
+  showLoading();
+  try {
+    await apiCall(`/bots/${botId}/status`, {
+      method: 'POST',
+      body: JSON.stringify({ ping: Math.floor(Math.random() * 20) + 30 })
+    });
+    await loadBots();
+  } catch (error) {
+    showError('Erro ao atualizar bot');
+  } finally {
+    hideLoading();
+  }
 }
 
 // ===== UI HELPERS =====
