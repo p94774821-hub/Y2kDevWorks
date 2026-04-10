@@ -312,15 +312,6 @@ body {
   background: var(--primary-dark);
 }
 
-.mobile-menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
 /* HERO SECTION */
 .hero {
   min-height: 100vh;
@@ -380,7 +371,7 @@ body {
   font-family: 'JetBrains Mono', monospace;
   color: var(--primary-light);
   margin-bottom: clamp(20px, 5vw, 30px);
-  font-size: clamp(0.8rem, 3vw, 1.1rem);
+  font-size: clamp(0.9rem, 3.5vw, 1.2rem);
   line-height: 1.6;
   text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
 }
@@ -627,7 +618,7 @@ body {
   font-family: 'JetBrains Mono', monospace;
   color: var(--primary-light);
   margin-bottom: clamp(20px, 4vw, 25px);
-  font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+  font-size: clamp(0.85rem, 3vw, 1rem);
   line-height: 1.8;
   text-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
 }
@@ -932,11 +923,14 @@ body {
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .nav-menu {
-    display: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
   }
   
-  .mobile-menu-btn {
-    display: block;
+  .nav-cta {
+    display: none;
   }
   
   .about-grid {
@@ -971,12 +965,20 @@ body {
 }
 
 @media (max-width: 480px) {
+  .nav-menu {
+    gap: 10px;
+  }
+  
+  .nav-link {
+    font-size: 0.75rem;
+  }
+  
   .hero-title {
     font-size: clamp(1.8rem, 8vw, 2.5rem);
   }
   
   .hero-bio {
-    font-size: clamp(0.7rem, 3.5vw, 0.9rem);
+    font-size: clamp(0.8rem, 3.5vw, 1rem);
   }
   
   .trust-item {
@@ -1049,10 +1051,6 @@ body {
         <a href="#contato" class="nav-link">Contato</a>
         <a href="#contato" class="nav-cta">Contratar</a>
       </div>
-      
-      <button class="mobile-menu-btn" onclick="alert('Menu mobile: Home | Projetos | Sobre | Contato')">
-        <i class="fas fa-bars"></i>
-      </button>
     </div>
   </div>
 </nav>
@@ -1072,8 +1070,7 @@ body {
       </h1>
       
       <div class="hero-bio">
-        𝙳𝚎𝚜𝚎𝚗𝚟𝚘𝚕𝚟𝚎𝚍𝚘𝚛 𝚍𝚎 𝚜𝚒𝚜𝚝𝚎𝚖𝚊𝚜 𝚙𝚊𝚛𝚊 𝙳𝚒𝚜𝚌𝚘𝚛𝚍<br>
-        𝙱𝚘𝚝𝚜 𝚙𝚎𝚛𝚜𝚘𝚗𝚊𝚕𝚒𝚣𝚊𝚍𝚘𝚜 • 𝙰𝚞𝚝𝚘𝚖𝚊𝚌̧𝚊̃𝚘
+        𝙳𝚎𝚜𝚎𝚗𝚟𝚘𝚕𝚟𝚎𝚍𝚘𝚛 𝚍𝚎 𝚜𝚒𝚜𝚝𝚎𝚖𝚊𝚜 𝚙𝚊𝚛𝚊 𝙳𝚒𝚜𝚌𝚘𝚛𝚍
       </div>
       
       <p class="hero-description">
@@ -1230,8 +1227,7 @@ body {
         </div>
         <h3 class="about-name">Isac</h3>
         <div class="about-bio-mono">
-          𝙳𝚎𝚜𝚎𝚗𝚟𝚘𝚕𝚟𝚎𝚍𝚘𝚛 𝚍𝚎 𝚜𝚒𝚜𝚝𝚎𝚖𝚊𝚜 𝚙𝚊𝚛𝚊 𝙳𝚒𝚜𝚌𝚘𝚛𝚍<br>
-          𝙱𝚘𝚝𝚜 𝚙𝚎𝚛𝚜𝚘𝚗𝚊𝚕𝚒𝚣𝚊𝚍𝚘𝚜 • 𝙰𝚞𝚝𝚘𝚖𝚊𝚌̧𝚊̃𝚘
+          𝙳𝚎𝚜𝚎𝚗𝚟𝚘𝚕𝚟𝚎𝚍𝚘𝚛 𝚍𝚎 𝚜𝚒𝚜𝚝𝚎𝚖𝚊𝚜 𝚙𝚊𝚛𝚊 𝙳𝚒𝚜𝚌𝚘𝚛𝚍
         </div>
         <div class="about-experience">
           <div class="exp-item">
