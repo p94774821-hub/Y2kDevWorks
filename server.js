@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 
 const express = require('express');
@@ -8,10 +9,29 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+// ===== ADICIONADO - WebSocket para Terminal =====
+const http = require('http');
+const WebSocket = require('ws');
+
 const app = express();
+// ===== MODIFICADO - Usar server HTTP para WebSocket =====
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_change_me';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Y2k2024@';
+
+// ===== ADICIONADO - Configurações do Terminal =====
+const TERMINAL_SECRET = process.env.TERMINAL_SECRET || 'y2k-terminal-secret-2024';
+
+// ===== ADICIONADO - Estado do site para controle via terminal =====
+let siteStatus = {
+  online: true,
+  maintenanceMode: false,
+  lastToggle: null,
+  accessLogs: []
+};
 
 // Hash da senha
 let ADMIN_PASSWORD_HASH = '';
@@ -30,6 +50,56 @@ initPasswordHash();
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
+
+// ===== ADICIONADO - Middleware para verificar se site está online =====
+app.use((req, res, next) => {
+  // Permitir acesso ao painel admin, API, e páginas de status mesmo offline
+  if (req.path === '/admin.html' || 
+      req.path === '/Admin.html' ||
+      req.path.startsWith('/api') || 
+      req.path === '/offline.html' ||
+      req.path === '/maintenance.html' ||
+      req.path === '/health') {
+    return next();
+  }
+  
+  // Se site estiver offline
+  if (!siteStatus.online) {
+    // Verificar se o arquivo offline.html existe
+    const offlinePath = path.join(__dirname, 'offline.html');
+    if (fs.existsSync(offlinePath)) {
+      return res.status(503).sendFile(offlinePath);
+    }
+    return res.status(503).send(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Site Offline</title></head>
+      <body style="background:#0a0a0a;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
+        <div style="text-align:center"><h1 style="color:#ff1a1a">🔴 Site Offline</h1><p>O site está temporariamente offline.</p></div>
+      </body>
+      </html>
+    `);
+  }
+  
+  // Se estiver em manutenção
+  if (siteStatus.maintenanceMode) {
+    const maintenancePath = path.join(__dirname, 'maintenance.html');
+    if (fs.existsSync(maintenancePath)) {
+      return res.status(503).sendFile(maintenancePath);
+    }
+    return res.status(503).send(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Em Manutenção</title></head>
+      <body style="background:#0a0a0a;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
+        <div style="text-align:center"><h1 style="color:#f59e0b">⚠️ Em Manutenção</h1><p>Estamos realizando melhorias. Volte em breve!</p></div>
+      </body>
+      </html>
+    `);
+  }
+  
+  next();
+});
 
 // ===== MIDDLEWARE DE AUTENTICAÇÃO JWT =====
 function authenticateToken(req, res, next) {
@@ -55,7 +125,7 @@ function blockMobile(req, res, next) {
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
   
   if (isMobile && req.path.startsWith('/api/')) {
-    if (req.path === '/api/login' || req.path === '/api/bot/heartbeat') {
+    if (req.path === '/api/login' || req.path === '/api/bot/heartbeat' || req.path === '/api/site-status') {
       return next();
     }
     return res.status(403).json({ error: 'Acesso administrativo apenas por desktop' });
@@ -74,6 +144,30 @@ app.get('/admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
+app.get('/Admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Admin.html'));
+});
+
+// ===== ADICIONADO - Rota Health Check (Railway) =====
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    site: siteStatus.online ? 'online' : 'offline',
+    maintenance: siteStatus.maintenanceMode,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// ===== ADICIONADO - Rota para status do site =====
+app.get('/api/site-status', (req, res) => {
+  res.json({
+    online: siteStatus.online,
+    maintenanceMode: siteStatus.maintenanceMode,
+    lastToggle: siteStatus.lastToggle,
+    logs: siteStatus.accessLogs.slice(-20) // Últimos 20 logs
+  });
+});
+
 // ===== API DE AUTENTICAÇÃO =====
 app.post('/api/login', async (req, res) => {
   const { password } = req.body;
@@ -86,6 +180,11 @@ app.post('/api/login', async (req, res) => {
     const isValid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
     
     if (!isValid) {
+      // ===== ADICIONADO - Registrar tentativa falha =====
+      siteStatus.accessLogs.push({
+        timestamp: Date.now(),
+        action: '[API] Tentativa de login falhou'
+      });
       return res.status(401).json({ error: 'Senha incorreta' });
     }
     
@@ -94,6 +193,12 @@ app.post('/api/login', async (req, res) => {
       JWT_SECRET,
       { expiresIn: '24h' }
     );
+    
+    // ===== ADICIONADO - Registrar login bem-sucedido =====
+    siteStatus.accessLogs.push({
+      timestamp: Date.now(),
+      action: '[API] Login realizado com sucesso'
+    });
     
     res.json({
       success: true,
@@ -141,6 +246,12 @@ app.post('/api/save', authenticateToken, (req, res) => {
   try {
     const dataPath = path.join(__dirname, 'data', 'content.json');
     fs.writeFileSync(dataPath, JSON.stringify(sanitizedContent, null, 2));
+    
+    // ===== ADICIONADO - Registrar log =====
+    siteStatus.accessLogs.push({
+      timestamp: Date.now(),
+      action: `[API] Conteúdo salvo por ${req.user.user}`
+    });
     
     console.log(`✅ Conteúdo salvo por ${req.user.user} em ${new Date().toISOString()}`);
     
@@ -239,6 +350,12 @@ app.post('/api/bot/heartbeat', (req, res) => {
   
   bot.ultimaAtualizacao = new Date().toISOString();
   
+  // ===== ADICIONADO - Registrar heartbeat =====
+  siteStatus.accessLogs.push({
+    timestamp: Date.now(),
+    action: `[HEARTBEAT] ${bot.nome} - Status: ${bot.status}`
+  });
+  
   console.log(`📡 Heartbeat recebido: ${bot.nome} - Status: ${bot.status}, Servidores: ${bot.servidores}, Usuários: ${bot.usuarios}`);
   
   res.json({
@@ -273,6 +390,33 @@ app.get('/api/bots', authenticateToken, (req, res) => {
     totalServidores: calcularServidoresUnicos(),
     totalUsuarios: calcularUsuariosUnicos(),
     updatedAt: new Date().toISOString()
+  });
+});
+
+// ===== ADICIONADO - API para atualizar status do bot via admin =====
+app.post('/api/bots/:botId/status', authenticateToken, (req, res) => {
+  const { botId } = req.params;
+  const { ping } = req.body;
+  
+  const bot = botsData[botId];
+  if (!bot) {
+    return res.status(404).json({ error: 'Bot não encontrado' });
+  }
+  
+  if (ping !== undefined) {
+    bot.ping = parseInt(ping) || 0;
+  }
+  
+  bot.ultimaAtualizacao = new Date().toISOString();
+  
+  siteStatus.accessLogs.push({
+    timestamp: Date.now(),
+    action: `[ADMIN] Status do bot ${bot.nome} atualizado`
+  });
+  
+  res.json({
+    success: true,
+    message: 'Status do bot atualizado'
   });
 });
 
@@ -354,11 +498,277 @@ function sanitizeContent(content) {
   return sanitized;
 }
 
-// Inicia o servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`🔐 JWT configurado com segurança`);
-  console.log(`🤖 Monitor de Bots ativo (${Object.keys(botsData).length} bot) - APENAS INSIGHT`);
-  console.log(`📡 Endpoint Heartbeat: POST /api/bot/heartbeat`);
-  console.log(`📁 Diretório: ${__dirname}`);
+// ===== SISTEMA DE TERMINAL VIA WEBSOCKET (ADICIONADO) =====
+wss.on('connection', (ws, req) => {
+  const clientIP = req.socket.remoteAddress;
+  console.log(`🖥️ Terminal conectado de ${clientIP}`);
+  let authenticated = false;
+
+  ws.on('message', (message) => {
+    try {
+      const data = JSON.parse(message);
+      
+      if (!authenticated) {
+        if (data.type === 'auth' && data.secret === TERMINAL_SECRET) {
+          authenticated = true;
+          ws.send(JSON.stringify({
+            type: 'auth_success',
+            message: '✅ Autenticado com sucesso no Y2K Terminal!',
+            prompt: 'y2k> '
+          }));
+          
+          ws.send(JSON.stringify({
+            type: 'status',
+            data: siteStatus
+          }));
+        } else {
+          ws.send(JSON.stringify({
+            type: 'error',
+            message: '❌ Falha na autenticação. Secret inválido.'
+          }));
+          ws.close();
+        }
+        return;
+      }
+      
+      if (data.type === 'command') {
+        handleTerminalCommand(data.command, ws);
+      }
+      
+    } catch (error) {
+      ws.send(JSON.stringify({
+        type: 'error',
+        message: `❌ Erro: ${error.message}`
+      }));
+    }
+  });
+  
+  ws.on('close', () => {
+    console.log(`🖥️ Terminal desconectado de ${clientIP}`);
+  });
+});
+
+function handleTerminalCommand(cmd, ws) {
+  const args = cmd.trim().split(/\s+/);
+  const command = args[0].toLowerCase();
+  
+  const commands = {
+    help: () => {
+      return `
+╔══════════════════════════════════════════════════════════╗
+║           🖥️  Y2K TERMINAL ADMINISTRATIVO  🖥️            ║
+╠══════════════════════════════════════════════════════════╣
+║                                                          ║
+║  🌐 CONTROLE DO SITE:                                    ║
+║    status              - Ver status atual                ║
+║    offline             - Deixar site OFFLINE             ║
+║    online              - Reativar site                   ║
+║    maintenance on/off  - Modo manutenção                 ║
+║    toggle              - Alternar online/offline         ║
+║                                                          ║
+║  🤖 BOTS:                                                ║
+║    bots                - Listar bots                     ║
+║    bot-status <id>     - Ver status de um bot            ║
+║                                                          ║
+║  🔐 ADMIN:                                               ║
+║    check-password <s>  - Verificar senha do admin        ║
+║                                                          ║
+║  📊 LOGS:                                                ║
+║    logs [limite]       - Ver últimos logs                ║
+║    clear-logs          - Limpar logs                     ║
+║                                                          ║
+║  🖥️ TERMINAL:                                            ║
+║    clear               - Limpar tela                     ║
+║    exit                - Desconectar                     ║
+║    help                - Esta ajuda                      ║
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+`;
+    },
+    
+    status: () => {
+      return `
+📊 STATUS DO SITE - ${new Date().toLocaleString('pt-BR')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌐 Site: ${siteStatus.online ? '🟢 ONLINE' : '🔴 OFFLINE'}
+🔧 Manutenção: ${siteStatus.maintenanceMode ? '⚠️ ATIVADA' : '✅ DESATIVADA'}
+🕐 Última alteração: ${siteStatus.lastToggle ? new Date(siteStatus.lastToggle).toLocaleString('pt-BR') : 'Nunca'}
+📝 Logs registrados: ${siteStatus.accessLogs.length}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+    },
+    
+    offline: () => {
+      if (!siteStatus.online) {
+        return '⚠️ Site já está OFFLINE.';
+      }
+      siteStatus.online = false;
+      siteStatus.lastToggle = Date.now();
+      broadcastStatus();
+      return '🔴 Site colocado em modo OFFLINE com sucesso!\n📱 Usuários verão a página offline.html';
+    },
+    
+    online: () => {
+      if (siteStatus.online) {
+        return '⚠️ Site já está ONLINE.';
+      }
+      siteStatus.online = true;
+      siteStatus.lastToggle = Date.now();
+      broadcastStatus();
+      return '🟢 Site reativado com sucesso! Agora está ONLINE.';
+    },
+    
+    maintenance: () => {
+      const action = args[1]?.toLowerCase();
+      if (action === 'on') {
+        siteStatus.maintenanceMode = true;
+        broadcastStatus();
+        return '⚠️ Modo de manutenção ATIVADO.\n📱 Usuários verão a página maintenance.html';
+      } else if (action === 'off') {
+        siteStatus.maintenanceMode = false;
+        broadcastStatus();
+        return '✅ Modo de manutenção DESATIVADO.';
+      } else {
+        return `🔧 Modo manutenção: ${siteStatus.maintenanceMode ? 'ATIVADO' : 'DESATIVADO'}\n💡 Use: maintenance on  ou  maintenance off`;
+      }
+    },
+    
+    toggle: () => {
+      siteStatus.online = !siteStatus.online;
+      siteStatus.lastToggle = Date.now();
+      broadcastStatus();
+      return siteStatus.online ? '🟢 Site agora ONLINE' : '🔴 Site agora OFFLINE';
+    },
+    
+    bots: () => {
+      const bots = Object.values(botsData);
+      return `
+🤖 BOTS CADASTRADOS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${bots.map(b => `${b.nome} (${b.id}): ${b.status === 'online' ? '🟢' : b.status === 'manutencao' ? '🟡' : '🔴'} ${b.status}`).join('\n')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total: ${bots.length} bot(s)
+`;
+    },
+    
+    'bot-status': () => {
+      const botId = args[1];
+      if (!botId) return '❌ Forneça o ID do bot: bot-status <id>';
+      
+      const bot = botsData[botId];
+      if (!bot) return `❌ Bot "${botId}" não encontrado.`;
+      
+      return `
+🤖 STATUS DO BOT: ${bot.nome}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 Status: ${bot.status === 'online' ? '🟢 ONLINE' : bot.status === 'manutencao' ? '🟡 MANUTENÇÃO' : '🔴 OFFLINE'}
+🖥️ Servidores: ${bot.servidores}
+👥 Usuários: ${bot.usuarios}
+⚡ Comandos: ${bot.comandos}
+📡 Ping: ${bot.ping}ms
+⏱️ Uptime: ${bot.uptime}
+📦 Versão: ${bot.versao}
+🕐 Última atualização: ${bot.ultimaAtualizacao ? new Date(bot.ultimaAtualizacao).toLocaleString('pt-BR') : 'Nunca'}
+📝 Descrição: ${bot.descricao}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+    },
+    
+    'check-password': () => {
+      const password = args[1];
+      if (!password) return '❌ Forneça a senha: check-password <senha>';
+      
+      // Comparação direta com a senha original (não o hash)
+      if (password === ADMIN_PASSWORD) {
+        return '✅ Senha CORRETA! Acesso ao painel administrativo autorizado.';
+      } else {
+        return '❌ Senha INCORRETA! Acesso negado.';
+      }
+    },
+    
+    logs: () => {
+      const limit = parseInt(args[1]) || 10;
+      const logs = siteStatus.accessLogs.slice(-limit);
+      
+      if (logs.length === 0) return '📝 Nenhum log registrado ainda.';
+      
+      return `
+📋 ÚLTIMOS ${logs.length} LOGS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${logs.map(log => `[${new Date(log.timestamp).toLocaleString('pt-BR')}] ${log.action}`).join('\n')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+    },
+    
+    'clear-logs': () => {
+      const count = siteStatus.accessLogs.length;
+      siteStatus.accessLogs = [];
+      return `🧹 ${count} logs foram limpos com sucesso!`;
+    },
+    
+    clear: () => {
+      return '\x1b[2J\x1b[H';
+    },
+    
+    exit: () => {
+      ws.close();
+      return null;
+    }
+  };
+  
+  let response;
+  if (commands[command]) {
+    response = commands[command]();
+  } else {
+    response = `❌ Comando desconhecido: "${command}"\n💡 Digite "help" para ver os comandos disponíveis.`;
+  }
+  
+  if (response !== null) {
+    // Registrar comandos que alteram estado
+    if (['offline', 'online', 'maintenance', 'toggle'].includes(command)) {
+      siteStatus.accessLogs.push({
+        timestamp: Date.now(),
+        action: `[TERMINAL] Comando executado: ${cmd}`
+      });
+    }
+    
+    ws.send(JSON.stringify({
+      type: 'response',
+      message: response,
+      prompt: 'y2k> '
+    }));
+  }
+}
+
+function broadcastStatus() {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({
+        type: 'status_update',
+        data: siteStatus
+      }));
+    }
+  });
+}
+
+// ===== INICIAR SERVIDOR (MODIFICADO - Usar server.listen) =====
+server.listen(PORT, () => {
+  console.log(`
+╔══════════════════════════════════════════════════════════╗
+║         🚀 Y2K DEVWORKS - SERVIDOR INICIADO 🚀          ║
+╠══════════════════════════════════════════════════════════╣
+║  📡 Servidor Web: http://localhost:${PORT}
+║  🔐 Painel Admin: http://localhost:${PORT}/Admin.html
+║  🖥️ Terminal WS: ws://localhost:${PORT}
+║  ❤️  Health Check: http://localhost:${PORT}/health
+║                                                          ║
+║  🔐 JWT configurado com segurança                        ║
+║  🤖 Monitor de Bots ativo (${Object.keys(botsData).length} bot) - APENAS INSIGHT
+║  📡 Endpoint Heartbeat: POST /api/bot/heartbeat          ║
+║  📁 Diretório: ${__dirname}
+║                                                          ║
+║  💡 Use o cliente terminal para conectar:                ║
+║     node terminal-client.js                              ║
+╚══════════════════════════════════════════════════════════╝
+  `);
 });
