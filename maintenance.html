@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manutenção - Y2K DevWorks</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a00 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            max-width: 500px;
+            padding: 50px 40px;
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 0 60px rgba(255, 165, 0, 0.2);
+        }
+        .icon {
+            font-size: 5rem;
+            color: #f59e0b;
+            margin-bottom: 30px;
+            animation: spin 4s linear infinite;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #f59e0b;
+        }
+        p {
+            color: #999;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .status {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid #f59e0b;
+            border-radius: 50px;
+            color: #f59e0b;
+            font-weight: 600;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">⚠️</div>
+        <h1>Em Manutenção</h1>
+        <p>Estamos realizando melhorias no site para oferecer uma experiência ainda melhor.</p>
+        <p>Voltaremos em breve!</p>
+        <div class="status">Modo Manutenção</div>
+        <p style="margin-top: 40px; font-size: 0.85rem; color: #666;">
+            Y2K DevWorks • Atualização em andamento
+        </p>
+    </div>
+</body>
+</html>
