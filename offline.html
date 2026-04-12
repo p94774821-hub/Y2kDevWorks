@@ -3,69 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Offline - Y2K DevWorks</title>
+    <title>Site Offline - Y2kDevWorks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #a855f7;
+            --primary-dark: #9333ea;
+            --bg-dark: #050505;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 100%);
-            color: white;
+            background: var(--bg-dark);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(147, 51, 234, 0.04) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
         .container {
             text-align: center;
-            max-width: 500px;
+            max-width: 550px;
+            width: 100%;
             padding: 50px 40px;
-            background: rgba(20, 20, 20, 0.9);
-            border: 2px solid rgba(255, 0, 0, 0.3);
-            border-radius: 24px;
-            box-shadow: 0 0 60px rgba(255, 0, 0, 0.2);
+            background: rgba(12, 12, 12, 0.95);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(168, 85, 247, 0.15);
+            backdrop-filter: blur(20px);
+            animation: fadeInUp 0.6s ease;
         }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .logo-icon {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            background: rgba(168, 85, 247, 0.1);
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            border: 1.5px solid rgba(168, 85, 247, 0.3);
+            text-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo-text span:first-child { color: white; }
+        .logo-text .highlight { color: var(--primary); text-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
+        
         .icon {
             font-size: 5rem;
-            color: #ff1a1a;
-            margin-bottom: 30px;
-            animation: pulse 2s infinite;
+            color: var(--primary);
+            margin-bottom: 25px;
+            animation: pulse 2.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.4));
         }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            color: #ff1a1a;
-        }
-        p {
-            color: #999;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        .status {
-            display: inline-block;
-            padding: 8px 20px;
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid #ff1a1a;
-            border-radius: 50px;
-            color: #ff1a1a;
-            font-weight: 600;
-        }
+        
         @keyframes pulse {
-            0%, 100% { opacity: 0.7; transform: scale(1); }
+            0%, 100% { opacity: 0.8; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .message {
+            color: var(--text-secondary);
+            margin-bottom: 35px;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 50px;
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+        
+        .status-badge i {
+            font-size: 0.7rem;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        .info-box {
+            padding: 20px;
+            background: rgba(168, 85, 247, 0.05);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .info-box i {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+        
+        .info-box p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 30px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(168, 85, 247, 0.4);
+        }
+        
+        .footer {
+            margin-top: 40px;
+            color: #505050;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .footer i {
+            color: var(--primary);
+            margin: 0 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="icon">🔴</div>
+        <div class="logo">
+            <div class="logo-icon">&gt;_</div>
+            <div class="logo-text">
+                <span>Y2K</span><span class="highlight">DevWorks</span>
+            </div>
+        </div>
+        
+        <div class="icon">
+            <i class="fas fa-power-off"></i>
+        </div>
+        
         <h1>Site Offline</h1>
-        <p>O site está temporariamente offline para manutenção ou atualizações.</p>
-        <p>Por favor, tente novamente mais tarde.</p>
-        <div class="status">Status: Offline</div>
-        <p style="margin-top: 40px; font-size: 0.85rem; color: #666;">
-            Y2K DevWorks • Administração
+        
+        <p class="message">
+            Nosso site está temporariamente offline para manutenção ou atualizações.<br>
+            Estamos trabalhando para voltar o mais rápido possível.
         </p>
+        
+        <div class="status-badge">
+            <i class="fas fa-circle"></i>
+            <span>STATUS: OFFLINE</span>
+        </div>
+        
+        <div class="info-box">
+            <i class="fas fa-clock"></i>
+            <p>Por favor, tente novamente mais tarde. Agradecemos sua paciência!</p>
+        </div>
+        
+        <a href="javascript:location.reload()" class="btn">
+            <i class="fas fa-sync-alt"></i> Tentar Novamente
+        </a>
+        
+        <div class="footer">
+            <i class="fas fa-terminal"></i> Y2kDevWorks <i class="fas fa-terminal"></i><br>
+            Sistemas e Automação para Discord
+        </div>
     </div>
+    
+    <script>
+        // Tentar reconectar automaticamente a cada 30 segundos
+        setInterval(() => {
+            fetch('/health')
+                .then(res => {
+                    if (res.ok) location.reload();
+                })
+                .catch(() => {});
+        }, 30000);
+    </script>
 </body>
 </html>
