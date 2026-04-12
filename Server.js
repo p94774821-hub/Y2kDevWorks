@@ -124,7 +124,7 @@ function blockMobile(req, res, next) {
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
   
   if (isMobile && req.path.startsWith('/api/')) {
-    if (req.path === '/api/login' || req.path === '/api/bot/heartbeat' || req.path === '/api/site-status') {
+    if (req.path === '/api/login' || req.path === '/api/bot/heartbeat' || req.path === '/api/site-status' || req.path === '/api/save-site-status') {
       return next();
     }
     return res.status(403).json({ error: 'Acesso administrativo apenas por desktop' });
@@ -157,14 +157,55 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ===== ADICIONADO - Rota para status do site =====
+// ===== ADICIONADO - Rota para OBTER status do site =====
 app.get('/api/site-status', (req, res) => {
   res.json({
     online: siteStatus.online,
     maintenanceMode: siteStatus.maintenanceMode,
     lastToggle: siteStatus.lastToggle,
-    logs: siteStatus.accessLogs.slice(-20) // Últimos 20 logs
+    logs: siteStatus.accessLogs.slice(-20)
   });
+});
+
+// ===== ⭐⭐⭐ ADICIONADO - Rota para SALVAR status do site ⭐⭐⭐ =====
+app.post('/api/site-status', authenticateToken, (req, res) => {
+  const { online, maintenanceMode } = req.body;
+  
+  try {
+    // Atualizar status
+    if (online !== undefined) siteStatus.online = online;
+    if (maintenanceMode !== undefined) siteStatus.maintenanceMode = maintenanceMode;
+    
+    siteStatus.lastToggle = Date.now();
+    
+    // Registrar log
+    let statusText = 'online';
+    if (!siteStatus.online) statusText = 'offline';
+    else if (siteStatus.maintenanceMode) statusText = 'maintenance';
+    
+    siteStatus.accessLogs.push({
+      timestamp: Date.now(),
+      action: `[API] Site alterado para: ${statusText} por ${req.user.user}`
+    });
+    
+    console.log(`🌐 Status do site alterado: ${statusText} por ${req.user.user}`);
+    
+    // Transmitir para terminais conectados
+    broadcastStatus();
+    
+    res.json({
+      success: true,
+      message: 'Status do site atualizado com sucesso!',
+      status: {
+        online: siteStatus.online,
+        maintenanceMode: siteStatus.maintenanceMode,
+        lastToggle: siteStatus.lastToggle
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao salvar status:', error);
+    res.status(500).json({ error: 'Erro ao salvar status do site' });
+  }
 });
 
 // ===== API DE AUTENTICAÇÃO =====
@@ -179,7 +220,6 @@ app.post('/api/login', async (req, res) => {
     const isValid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
     
     if (!isValid) {
-      // ===== ADICIONADO - Registrar tentativa falha =====
       siteStatus.accessLogs.push({
         timestamp: Date.now(),
         action: '[API] Tentativa de login falhou'
@@ -193,7 +233,6 @@ app.post('/api/login', async (req, res) => {
       { expiresIn: '24h' }
     );
     
-    // ===== ADICIONADO - Registrar login bem-sucedido =====
     siteStatus.accessLogs.push({
       timestamp: Date.now(),
       action: '[API] Login realizado com sucesso'
@@ -246,7 +285,6 @@ app.post('/api/save', authenticateToken, (req, res) => {
     const dataPath = path.join(__dirname, 'data', 'content.json');
     fs.writeFileSync(dataPath, JSON.stringify(sanitizedContent, null, 2));
     
-    // ===== ADICIONADO - Registrar log =====
     siteStatus.accessLogs.push({
       timestamp: Date.now(),
       action: `[API] Conteúdo salvo por ${req.user.user}`
@@ -265,28 +303,24 @@ app.post('/api/save', authenticateToken, (req, res) => {
   }
 });
 
-// ===== API PARA SALVAR TEMA E COR (SINCRONIZAÇÃO ENTRE DISPOSITIVOS) =====
+// ===== API PARA SALVAR TEMA E COR =====
 app.post('/api/save-theme', authenticateToken, (req, res) => {
   const { theme, primaryColor } = req.body;
   
   try {
     const dataPath = path.join(__dirname, 'data', 'content.json');
     
-    // Ler conteúdo existente
     let data = {};
     if (fs.existsSync(dataPath)) {
       data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
     }
     
-    // Adicionar/atualizar tema
     data.theme = data.theme || {};
     data.theme.mode = theme;
     data.theme.primaryColor = primaryColor;
     
-    // Salvar
     fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
     
-    // Registrar log
     siteStatus.accessLogs.push({
       timestamp: Date.now(),
       action: `[TEMA] Alterado para ${theme} - Cor: ${primaryColor}`
@@ -390,7 +424,6 @@ app.post('/api/bot/heartbeat', (req, res) => {
   
   bot.ultimaAtualizacao = new Date().toISOString();
   
-  // ===== ADICIONADO - Registrar heartbeat =====
   siteStatus.accessLogs.push({
     timestamp: Date.now(),
     action: `[HEARTBEAT] ${bot.nome} - Status: ${bot.status}`
@@ -433,7 +466,7 @@ app.get('/api/bots', authenticateToken, (req, res) => {
   });
 });
 
-// ===== ADICIONADO - API para atualizar status do bot via admin =====
+// ===== API para atualizar status do bot via admin =====
 app.post('/api/bots/:botId/status', authenticateToken, (req, res) => {
   const { botId } = req.params;
   const { ping } = req.body;
@@ -541,7 +574,6 @@ function sanitizeContent(content) {
     sanitized.contato.horario_fim = String(sanitized.contato.horario_fim || '').trim().substring(0, 50);
   }
   
-  // Preservar tema
   if (content.theme) {
     sanitized.theme = content.theme;
   }
@@ -652,129 +684,99 @@ function handleTerminalCommand(cmd, ws) {
     offline: () => {
       if (!siteStatus.online) return '⚠️ Site já está OFFLINE.';
       siteStatus.online = false;
+      siteStatus.maintenanceMode = false;
       siteStatus.lastToggle = Date.now();
+      siteStatus.accessLogs.push({ timestamp: Date.now(), action: '[TERMINAL] Site OFFLINE' });
       broadcastStatus();
-      return '🔴 Site colocado em modo OFFLINE com sucesso!';
+      return '🔴 Site OFFLINE!';
     },
     
     online: () => {
-      if (siteStatus.online) return '⚠️ Site já está ONLINE.';
+      if (siteStatus.online && !siteStatus.maintenanceMode) return '⚠️ Site já está ONLINE.';
       siteStatus.online = true;
+      siteStatus.maintenanceMode = false;
       siteStatus.lastToggle = Date.now();
+      siteStatus.accessLogs.push({ timestamp: Date.now(), action: '[TERMINAL] Site ONLINE' });
       broadcastStatus();
-      return '🟢 Site reativado com sucesso! Agora está ONLINE.';
+      return '🟢 Site ONLINE!';
     },
     
     maintenance: () => {
       const action = args[1]?.toLowerCase();
       if (action === 'on') {
+        siteStatus.online = true;
         siteStatus.maintenanceMode = true;
+        siteStatus.lastToggle = Date.now();
+        siteStatus.accessLogs.push({ timestamp: Date.now(), action: '[TERMINAL] Manutenção ATIVADA' });
         broadcastStatus();
-        return '⚠️ Modo de manutenção ATIVADO.';
+        return '⚠️ Modo manutenção ATIVADO.';
       } else if (action === 'off') {
         siteStatus.maintenanceMode = false;
+        siteStatus.lastToggle = Date.now();
+        siteStatus.accessLogs.push({ timestamp: Date.now(), action: '[TERMINAL] Manutenção DESATIVADA' });
         broadcastStatus();
-        return '✅ Modo de manutenção DESATIVADO.';
+        return '✅ Modo manutenção DESATIVADO.';
       }
       return `🔧 Modo manutenção: ${siteStatus.maintenanceMode ? 'ATIVADO' : 'DESATIVADO'}\n💡 Use: maintenance on/off`;
     },
     
     toggle: () => {
       siteStatus.online = !siteStatus.online;
+      siteStatus.maintenanceMode = false;
       siteStatus.lastToggle = Date.now();
+      siteStatus.accessLogs.push({ timestamp: Date.now(), action: `[TERMINAL] Toggle para ${siteStatus.online ? 'ONLINE' : 'OFFLINE'}` });
       broadcastStatus();
-      return siteStatus.online ? '🟢 Site agora ONLINE' : '🔴 Site agora OFFLINE';
+      return siteStatus.online ? '🟢 ONLINE' : '🔴 OFFLINE';
     },
     
     bots: () => {
       const bots = Object.values(botsData);
       return `
-🤖 SISTEMAS CADASTRADOS:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${bots.map(b => `${b.nome} (${b.id}): ${b.status === 'online' ? '🟢' : b.status === 'manutencao' ? '🟡' : '🔴'} ${b.status}`).join('\n')}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Total: ${bots.length} sistema(s)
+🤖 SISTEMAS:
+${bots.map(b => `${b.nome}: ${b.status === 'online' ? '🟢' : '🔴'} ${b.status}`).join('\n')}
+Total: ${bots.length}
 `;
     },
     
     'bot-status': () => {
       const botId = args[1];
-      if (!botId) return '❌ Forneça o ID: bot-status <id>';
+      if (!botId) return '❌ ID necessário';
       const bot = botsData[botId];
-      if (!bot) return `❌ Sistema "${botId}" não encontrado.`;
-      return `
-🤖 STATUS: ${bot.nome}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 Status: ${bot.status === 'online' ? '🟢 ONLINE' : bot.status === 'manutencao' ? '🟡 MANUTENÇÃO' : '🔴 OFFLINE'}
-🖥️ Servidores: ${bot.servidores}
-👥 Usuários: ${bot.usuarios}
-⚡ Comandos: ${bot.comandos}
-📡 Ping: ${bot.ping}ms
-⏱️ Uptime: ${bot.uptime}
-📦 Versão: ${bot.versao}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
+      if (!bot) return '❌ Não encontrado';
+      return `${bot.nome}: ${bot.status} | Servidores: ${bot.servidores} | Ping: ${bot.ping}ms`;
     },
     
     'check-password': () => {
-      const password = args[1];
-      if (!password) return '❌ Forneça a senha: check-password <senha>';
-      return password === ADMIN_PASSWORD ? '✅ Senha CORRETA!' : '❌ Senha INCORRETA!';
+      return args[1] === ADMIN_PASSWORD ? '✅ Correta!' : '❌ Incorreta!';
     },
     
     logs: () => {
       const limit = parseInt(args[1]) || 10;
       const logs = siteStatus.accessLogs.slice(-limit);
-      if (logs.length === 0) return '📝 Nenhum log registrado.';
-      return `
-📋 ÚLTIMOS ${logs.length} LOGS:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${logs.map(log => `[${new Date(log.timestamp).toLocaleString('pt-BR')}] ${log.action}`).join('\n')}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
+      if (logs.length === 0) return '📝 Nenhum log.';
+      return logs.map(log => `[${new Date(log.timestamp).toLocaleString('pt-BR')}] ${log.action}`).join('\n');
     },
     
     'clear-logs': () => {
-      const count = siteStatus.accessLogs.length;
       siteStatus.accessLogs = [];
-      return `🧹 ${count} logs limpos!`;
+      return '🧹 Logs limpos!';
     },
     
     clear: () => '\x1b[2J\x1b[H',
-    
     exit: () => { ws.close(); return null; }
   };
   
-  let response;
-  if (commands[command]) {
-    response = commands[command]();
-  } else {
-    response = `❌ Comando desconhecido: "${command}"\n💡 Digite "help" para ver os comandos.`;
-  }
+  let response = commands[command] ? commands[command]() : `❌ Comando desconhecido: "${command}"\n💡 Digite "help"`;
   
   if (response !== null) {
-    if (['offline', 'online', 'maintenance', 'toggle'].includes(command)) {
-      siteStatus.accessLogs.push({
-        timestamp: Date.now(),
-        action: `[TERMINAL] Comando: ${cmd}`
-      });
-    }
-    
-    ws.send(JSON.stringify({
-      type: 'response',
-      message: response,
-      prompt: 'y2k> '
-    }));
+    ws.send(JSON.stringify({ type: 'response', message: response, prompt: 'y2k> ' }));
   }
 }
 
 function broadcastStatus() {
   wss.clients.forEach(client => {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({
-        type: 'status_update',
-        data: siteStatus
-      }));
+      client.send(JSON.stringify({ type: 'status_update', data: siteStatus }));
     }
   });
 }
@@ -785,19 +787,10 @@ server.listen(PORT, () => {
 ╔══════════════════════════════════════════════════════════╗
 ║         🚀 Y2K DEVWORKS - SERVIDOR INICIADO 🚀          ║
 ╠══════════════════════════════════════════════════════════╣
-║  📡 Servidor Web: http://localhost:${PORT}
-║  🔐 Painel Admin: http://localhost:${PORT}/Admin.html
-║  🖥️ Terminal WS: ws://localhost:${PORT}
-║  ❤️  Health Check: http://localhost:${PORT}/health
-║                                                          ║
-║  🔐 JWT configurado com segurança                        ║
-║  🤖 Monitor de Sistemas ativo (${Object.keys(botsData).length} sistema)
-║  📡 Endpoint Heartbeat: POST /api/bot/heartbeat          ║
-║  🎨 Rota de Tema: POST /api/save-theme                   ║
-║  📁 Diretório: ${__dirname}
-║                                                          ║
-║  💡 Use o cliente terminal para conectar:                ║
-║     node terminal-client.js                              ║
+║  📡 Servidor: http://localhost:${PORT}
+║  🔐 Painel: http://localhost:${PORT}/Admin.html
+║  🖥️ Terminal: ws://localhost:${PORT}
+║  🌐 Status: ONLINE | Manutenção: DESATIVADA
 ╚══════════════════════════════════════════════════════════╝
   `);
 });
