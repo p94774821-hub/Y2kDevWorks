@@ -695,6 +695,8 @@
       font-weight: 600;
     }
     .status-badge.online { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-badge.offline { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .status-badge.maintenance { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
     .status-badge i { font-size: 0.6rem; }
 
     /* ===== BOTS LIST ===== */
@@ -1206,6 +1208,149 @@
       color: var(--text-primary);
     }
 
+    /* ===== CONFIGURAÇÕES DO SITE (NOVA ABA) ===== */
+    .site-status-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 25px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-theme);
+      border-radius: 20px;
+      margin-bottom: 25px;
+    }
+
+    .site-status-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+    }
+
+    .site-status-icon.online {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 2px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .site-status-icon.offline {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 2px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .site-status-icon.maintenance {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+      border: 2px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .site-status-info {
+      flex: 1;
+    }
+
+    .site-status-info h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .site-status-info p {
+      color: var(--text-secondary);
+    }
+
+    .control-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .control-btn {
+      padding: 20px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-theme);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .control-btn i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .control-btn h4 {
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+
+    .control-btn p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .control-btn.online {
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .control-btn.online i { color: var(--success); }
+    .control-btn.online:hover {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--success);
+    }
+
+    .control-btn.offline {
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .control-btn.offline i { color: var(--danger); }
+    .control-btn.offline:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--danger);
+    }
+
+    .control-btn.maintenance {
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .control-btn.maintenance i { color: var(--warning); }
+    .control-btn.maintenance:hover {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: var(--warning);
+    }
+
+    .control-btn.active {
+      border-width: 2px;
+      box-shadow: 0 0 20px currentColor;
+    }
+
+    .logs-container {
+      max-height: 300px;
+      overflow-y: auto;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-theme);
+      border-radius: 16px;
+      padding: 15px;
+    }
+
+    .log-item {
+      padding: 10px;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .log-item:last-child {
+      border-bottom: none;
+    }
+
+    .log-time {
+      color: var(--text-muted);
+      margin-right: 10px;
+    }
+
     /* Responsive */
     @media (max-width: 1200px) {
       .stats-overview { grid-template-columns: repeat(2, 1fr); }
@@ -1218,12 +1363,13 @@
       .settings-grid { grid-template-columns: 1fr; }
       .sidebar { width: 260px; }
       .main-content { margin-left: 260px; width: calc(100% - 260px); }
+      .control-buttons { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-<!-- ===== MODAL DE CONFIRMAÇÃO ===== -->
+<!-- ===== MODAIS E LOADING (MANTIDOS) ===== -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
     <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
@@ -1236,12 +1382,10 @@
   </div>
 </div>
 
-<!-- ===== LOADING OVERLAY ===== -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner"></div>
 </div>
 
-<!-- ===== TELA DE BLOQUEIO MOBILE ===== -->
 <div id="mobileBlockScreen">
   <div class="mobile-block-container">
     <div class="mobile-block-card">
@@ -1253,14 +1397,11 @@
         <div class="device-icon active"><i class="fas fa-laptop"></i><span>Desktop</span></div>
         <div class="device-icon"><i class="fas fa-tablet-alt"></i><span>Tablet</span></div>
       </div>
-      <p style="font-size: 0.9rem; color: var(--gray-500);"><i class="fas fa-info-circle"></i> Para melhor experiência de administração,<br>acesse este painel em um computador.</p>
       <a href="/" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar para o Site</a>
-      <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border-light); color: var(--gray-500);"><i class="fas fa-terminal"></i> Y2kDevWorks <i class="fas fa-terminal"></i><br><span style="font-family: 'JetBrains Mono', monospace;">admin@y2k-nat</span></div>
     </div>
   </div>
 </div>
 
-<!-- ===== TELA DE LOGIN ===== -->
 <div id="loginScreen">
   <div class="login-container">
     <div class="login-box">
@@ -1286,10 +1427,8 @@
   </div>
 </div>
 
-<!-- ===== PAINEL ADMIN ===== -->
 <div id="adminPanel">
   <div class="admin-layout">
-    <!-- Sidebar -->
     <div class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
@@ -1316,26 +1455,17 @@
         </div>
         <div class="nav-section">
           <div class="nav-section-title">Configurações</div>
+          <div class="nav-item" data-tab="siteconfig" onclick="showTab('siteconfig')"><i class="fas fa-globe"></i><span>Site</span></div>
           <div class="nav-item" data-tab="personalizacao" onclick="showTab('personalizacao')"><i class="fas fa-palette"></i><span>Personalização</span></div>
           <div class="nav-item" onclick="window.open('/', '_blank')"><i class="fas fa-eye"></i><span>Visualizar Site</span></div>
         </div>
       </div>
       
-      <!-- ===== SELETOR DE TEMA NA SIDEBAR ===== -->
       <div style="padding: 0 20px;">
         <div class="theme-selector">
-          <button class="theme-btn active" data-theme="dark" onclick="setTheme('dark')">
-            <i class="fas fa-moon"></i>
-            <span>Dark</span>
-          </button>
-          <button class="theme-btn" data-theme="light" onclick="setTheme('light')">
-            <i class="fas fa-sun"></i>
-            <span>Light</span>
-          </button>
-          <button class="theme-btn" data-theme="y2k-neon" onclick="setTheme('y2k-neon')">
-            <i class="fas fa-bolt"></i>
-            <span>Y2K</span>
-          </button>
+          <button class="theme-btn active" data-theme="dark" onclick="setTheme('dark')"><i class="fas fa-moon"></i><span>Dark</span></button>
+          <button class="theme-btn" data-theme="light" onclick="setTheme('light')"><i class="fas fa-sun"></i><span>Light</span></button>
+          <button class="theme-btn" data-theme="y2k-neon" onclick="setTheme('y2k-neon')"><i class="fas fa-bolt"></i><span>Y2K</span></button>
         </div>
       </div>
       
@@ -1348,14 +1478,13 @@
       </div>
     </div>
     
-    <!-- Main Content -->
     <div class="main-content">
       <!-- Dashboard Panel -->
       <div id="dashboard-panel" class="panel active">
         <div class="top-bar">
           <div class="page-title"><h1>Dashboard</h1><p>Visão geral completa do seu site</p></div>
           <div class="top-actions">
-            <div class="status-badge online"><i class="fas fa-circle"></i> Sistema Online</div>
+            <div class="status-badge online" id="dashboardStatusBadge"><i class="fas fa-circle"></i> <span id="dashboardStatusText">Carregando...</span></div>
             <button class="btn-action" onclick="window.open('/', '_blank')"><i class="fas fa-external-link-alt"></i> Ver Site</button>
             <button class="btn-action" onclick="loadContent()"><i class="fas fa-sync-alt"></i> Atualizar</button>
           </div>
@@ -1363,7 +1492,7 @@
         <div class="stats-overview" id="dashboard-stats"></div>
         <div class="charts-row">
           <div class="chart-card">
-            <div class="chart-header"><h3><i class="fas fa-chart-bar"></i> Visão Geral de Conteúdo</h3><span style="color: var(--gray-500); font-size: 0.8rem;">Atualizado agora</span></div>
+            <div class="chart-header"><h3><i class="fas fa-chart-bar"></i> Visão Geral de Conteúdo</h3></div>
             <div class="chart-container" id="content-chart"></div>
           </div>
           <div class="chart-card">
@@ -1372,13 +1501,13 @@
           </div>
         </div>
         <div class="activity-card">
-          <div class="activity-header"><h3><i class="fas fa-history"></i> Atividade Recente</h3><span style="color: var(--gray-500); font-size: 0.8rem;" id="lastUpdateDashboard">Carregando...</span></div>
+          <div class="activity-header"><h3><i class="fas fa-history"></i> Atividade Recente</h3></div>
           <div class="activity-list" id="activity-list"></div>
         </div>
         <div class="quick-actions">
           <div class="quick-action-btn" onclick="showTab('hero')"><i class="fas fa-edit"></i> Editar Hero</div>
           <div class="quick-action-btn" onclick="showTab('projetos')"><i class="fas fa-plus-circle"></i> Adicionar Solução</div>
-          <div class="quick-action-btn" onclick="showTab('contato')"><i class="fas fa-phone"></i> Editar Contatos</div>
+          <div class="quick-action-btn" onclick="showTab('siteconfig')"><i class="fas fa-globe"></i> Configurar Site</div>
         </div>
       </div>
       
@@ -1448,53 +1577,94 @@
       <!-- Sistemas Panel -->
       <div id="bots-panel" class="panel">
         <div class="top-bar">
-          <div class="page-title">
-            <h1>Monitor de Sistemas</h1>
-            <p>Acompanhe o status dos seus sistemas</p>
-          </div>
-          <div class="top-actions">
-            <button class="btn-action" onclick="loadBots()"><i class="fas fa-sync-alt"></i> Atualizar</button>
-          </div>
+          <div class="page-title"><h1>Monitor de Sistemas</h1><p>Acompanhe o status dos seus sistemas</p></div>
+          <div class="top-actions"><button class="btn-action" onclick="loadBots()"><i class="fas fa-sync-alt"></i> Atualizar</button></div>
         </div>
-        
         <div class="stats-overview" id="bots-stats"></div>
-        
         <div class="form-card">
-          <div class="form-card-header">
-            <h2><i class="fas fa-microchip"></i> Sistemas Ativos</h2>
-            <span style="color: var(--gray-500);" id="bots-count">0 sistemas</span>
-          </div>
+          <div class="form-card-header"><h2><i class="fas fa-microchip"></i> Sistemas Ativos</h2><span id="bots-count">0 sistemas</span></div>
           <div class="bots-list" id="bots-container"></div>
         </div>
-        
-        <div style="display: flex; gap: 20px; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px;">
-          <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: var(--success); border-radius: 50%;"></span> Online</div>
-          <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: var(--warning); border-radius: 50%;"></span> Manutenção</div>
-          <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; background: var(--danger); border-radius: 50%;"></span> Offline</div>
-        </div>
-        
         <div class="success-message" id="bots-success"><i class="fas fa-check-circle"></i> Sistemas atualizados!</div>
       </div>
       
-      <!-- ===== PAINEL DE PERSONALIZAÇÃO ===== -->
-      <div id="personalizacao-panel" class="panel">
+      <!-- ===== NOVA ABA: CONFIGURAÇÕES DO SITE ===== -->
+      <div id="siteconfig-panel" class="panel">
         <div class="top-bar">
           <div class="page-title">
-            <h1>Personalização do Site</h1>
-            <p>Configure aparência, animações e preferências</p>
+            <h1>Configurações do Site</h1>
+            <p>Controle o status online/offline e modo de manutenção</p>
           </div>
+          <div class="top-actions">
+            <button class="btn-action" onclick="loadSiteStatus()"><i class="fas fa-sync-alt"></i> Atualizar Status</button>
+          </div>
+        </div>
+        
+        <!-- Status Atual -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h2><i class="fas fa-info-circle"></i> Status Atual do Site</h2>
+          </div>
+          
+          <div class="site-status-card">
+            <div class="site-status-icon" id="siteStatusIcon">
+              <i class="fas fa-globe"></i>
+            </div>
+            <div class="site-status-info">
+              <h3 id="siteStatusTitle">Carregando...</h3>
+              <p id="siteStatusDescription">Obtendo status do servidor...</p>
+              <p style="margin-top: 10px; font-size: 0.85rem;" id="siteStatusLastToggle"></p>
+            </div>
+          </div>
+          
+          <div class="control-buttons">
+            <div class="control-btn online" id="btnOnline" onclick="setSiteMode('online')">
+              <i class="fas fa-check-circle"></i>
+              <h4>Modo Online</h4>
+              <p>Site acessível normalmente</p>
+            </div>
+            <div class="control-btn maintenance" id="btnMaintenance" onclick="setSiteMode('maintenance')">
+              <i class="fas fa-tools"></i>
+              <h4>Modo Manutenção</h4>
+              <p>Exibe página de manutenção</p>
+            </div>
+            <div class="control-btn offline" id="btnOffline" onclick="setSiteMode('offline')">
+              <i class="fas fa-power-off"></i>
+              <h4>Modo Offline</h4>
+              <p>Site totalmente inacessível</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Logs de Status -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h2><i class="fas fa-history"></i> Histórico de Alterações</h2>
+            <button class="btn-action" onclick="clearLogs()"><i class="fas fa-trash-alt"></i> Limpar Logs</button>
+          </div>
+          
+          <div class="logs-container" id="siteLogsContainer">
+            <div class="log-item">Carregando logs...</div>
+          </div>
+        </div>
+        
+        <div class="success-message" id="siteconfig-success">
+          <i class="fas fa-check-circle"></i> Configurações do site atualizadas!
+        </div>
+      </div>
+      
+      <!-- Personalização Panel -->
+      <div id="personalizacao-panel" class="panel">
+        <div class="top-bar">
+          <div class="page-title"><h1>Personalização do Site</h1><p>Configure aparência, animações e preferências</p></div>
           <div class="top-actions">
             <button class="btn-action" onclick="resetSettings()"><i class="fas fa-undo-alt"></i> Restaurar Padrão</button>
             <button class="btn-action" onclick="saveSettings()"><i class="fas fa-save"></i> Salvar Configurações</button>
           </div>
         </div>
         
-        <!-- Configurações de Tema -->
         <div class="form-card">
-          <div class="form-card-header">
-            <h2><i class="fas fa-palette"></i> Aparência Geral</h2>
-          </div>
-          
+          <div class="form-card-header"><h2><i class="fas fa-palette"></i> Aparência Geral</h2></div>
           <div class="settings-grid">
             <div class="setting-item">
               <label><i class="fas fa-fill-drip"></i> Esquema de Cores</label>
@@ -1504,216 +1674,19 @@
                 <option value="y2k-neon">Y2K Neon</option>
               </select>
             </div>
-            
             <div class="setting-item">
               <label><i class="fas fa-tint"></i> Cor Primária</label>
               <input type="color" id="primaryColor" value="#a855f7" onchange="updatePreview()">
             </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-font"></i> Fonte Principal</label>
-              <select id="fontFamily" onchange="updatePreview()">
-                <option value="Inter">Inter (Moderna)</option>
-                <option value="Poppins">Poppins (Elegante)</option>
-                <option value="Roboto">Roboto (Google)</option>
-                <option value="Montserrat">Montserrat (Clean)</option>
-              </select>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-text-height"></i> Tamanho da Fonte</label>
-              <input type="range" id="fontSize" min="12" max="20" value="16" onchange="updatePreview()">
-              <span class="setting-value" id="fontSizeValue">16px</span>
-            </div>
           </div>
-          
-          <!-- Preview em Tempo Real -->
-          <div class="site-preview">
-            <div class="preview-header">
-              <h4><i class="fas fa-eye"></i> Preview do Site</h4>
-              <span class="preview-badge" id="previewBadge">Y2K Dev</span>
-            </div>
-            <p style="color: var(--text-secondary); margin-bottom: 15px;" id="previewText">
-              Este é um exemplo de como o texto aparecerá no site principal.
-            </p>
-            <div class="preview-buttons">
-              <button class="preview-btn primary" id="previewBtnPrimary">Botão Primário</button>
-              <button class="preview-btn secondary" id="previewBtnSecondary">Botão Secundário</button>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Animações e Efeitos -->
-        <div class="form-card">
-          <div class="form-card-header">
-            <h2><i class="fas fa-magic"></i> Animações e Efeitos</h2>
-          </div>
-          
-          <div class="settings-grid">
-            <div class="setting-item">
-              <label><i class="fas fa-play-circle"></i> Estilo de Animação</label>
-              <select id="animationStyle" onchange="updatePreview()">
-                <option value="smooth">Suave (Padrão)</option>
-                <option value="bouncy">Saltitante</option>
-                <option value="glitchy">Y2K Glitch</option>
-                <option value="minimal">Minimalista</option>
-              </select>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-clock"></i> Velocidade das Animações</label>
-              <select id="animationSpeed" onchange="updatePreview()">
-                <option value="slow">Lento</option>
-                <option value="normal" selected>Normal</option>
-                <option value="fast">Rápido</option>
-              </select>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-star"></i> Efeitos Especiais</label>
-              <select id="specialEffects" onchange="updatePreview()">
-                <option value="none">Nenhum</option>
-                <option value="glow">Brilho Neon</option>
-                <option value="particles">Partículas</option>
-                <option value="scanlines">Scanlines Y2K</option>
-              </select>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-mouse-pointer"></i> Efeito Hover</label>
-              <select id="hoverEffect" onchange="updatePreview()">
-                <option value="scale">Escala</option>
-                <option value="glow">Brilho</option>
-                <option value="lift">Elevação</option>
-                <option value="none">Nenhum</option>
-              </select>
-            </div>
-          </div>
-          
-          <!-- Preview de Animações -->
-          <div class="animation-preview">
-            <div class="anim-box" id="animBox1" onclick="testAnimation('pulse')">
-              <i class="fas fa-heart"></i>
-            </div>
-            <div class="anim-box" id="animBox2" onclick="testAnimation('bounce')">
-              <i class="fas fa-arrow-up"></i>
-            </div>
-            <div class="anim-box" id="animBox3" onclick="testAnimation('spin')">
-              <i class="fas fa-sync-alt"></i>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Configurações de Layout -->
-        <div class="form-card">
-          <div class="form-card-header">
-            <h2><i class="fas fa-layout"></i> Layout e Estrutura</h2>
-          </div>
-          
-          <div class="settings-grid">
-            <div class="setting-item">
-              <label><i class="fas fa-border-all"></i> Estilo dos Cards</label>
-              <select id="cardStyle" onchange="updatePreview()">
-                <option value="glass">Glassmorphism</option>
-                <option value="solid">Sólido</option>
-                <option value="outline">Apenas Borda</option>
-                <option value="neon">Borda Neon</option>
-              </select>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-arrows-alt"></i> Largura do Conteúdo</label>
-              <select id="contentWidth" onchange="updatePreview()">
-                <option value="full">Full Width</option>
-                <option value="contained" selected>Contido</option>
-                <option value="narrow">Estreito</option>
-              </select>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-border-style"></i> Arredondamento</label>
-              <input type="range" id="borderRadius" min="0" max="24" value="12" onchange="updatePreview()">
-              <span class="setting-value" id="borderRadiusValue">12px</span>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-layer-group"></i> Espaçamento</label>
-              <select id="spacing" onchange="updatePreview()">
-                <option value="compact">Compacto</option>
-                <option value="normal" selected>Normal</option>
-                <option value="spacious">Espaçoso</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Configurações de Tipografia -->
-        <div class="form-card">
-          <div class="form-card-header">
-            <h2><i class="fas fa-paragraph"></i> Tipografia Avançada</h2>
-          </div>
-          
-          <div class="settings-grid">
-            <div class="setting-item">
-              <label><i class="fas fa-heading"></i> Peso dos Títulos</label>
-              <select id="headingWeight" onchange="updatePreview()">
-                <option value="400">Normal</option>
-                <option value="600">Semi-Negrito</option>
-                <option value="700" selected>Negrito</option>
-                <option value="800">Extra Negrito</option>
-              </select>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-italic"></i> Estilo do Texto</label>
-              <select id="textStyle" onchange="updatePreview()">
-                <option value="normal" selected>Normal</option>
-                <option value="uppercase">MAIÚSCULAS</option>
-                <option value="lowercase">minúsculas</option>
-                <option value="capitalize">Primeira Maiúscula</option>
-              </select>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-arrows-alt-v"></i> Altura da Linha</label>
-              <input type="range" id="lineHeight" min="1.2" max="2.0" step="0.1" value="1.6" onchange="updatePreview()">
-              <span class="setting-value" id="lineHeightValue">1.6</span>
-            </div>
-            
-            <div class="setting-item">
-              <label><i class="fas fa-arrows-alt-h"></i> Espaçamento entre Letras</label>
-              <input type="range" id="letterSpacing" min="-0.5" max="2" step="0.1" value="0" onchange="updatePreview()">
-              <span class="setting-value" id="letterSpacingValue">0px</span>
-            </div>
-          </div>
-          
-          <!-- Preview de Fonte -->
-          <div class="font-preview">
-            <p>Pré-visualização da fonte:</p>
-            <div class="font-sample" id="fontSample">
-              Y2K DevWorks • Design do Futuro
-            </div>
-            <p style="font-size: 0.85rem; margin-top: 10px; color: var(--text-muted);">
-              ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
-              abcdefghijklmnopqrstuvwxyz<br>
-              0123456789 !@#$%^&*()
-            </p>
-          </div>
-        </div>
-        
-        <button class="btn-save" onclick="applyAllSettings()">
-          <i class="fas fa-check-circle"></i> Aplicar Todas as Configurações
-        </button>
-        
-        <div class="success-message" id="settings-success">
-          <i class="fas fa-check-circle"></i> Configurações aplicadas com sucesso!
+          <button class="btn-save" onclick="applyAllSettings()"><i class="fas fa-check-circle"></i> Aplicar Configurações</button>
+          <div class="success-message" id="settings-success"><i class="fas fa-check-circle"></i> Configurações aplicadas!</div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Success Toast -->
 <div class="success-message" id="globalSuccess"><i class="fas fa-check-circle"></i> <span id="successMessage">Alterações salvas!</span></div>
 
 <script>
@@ -1722,6 +1695,7 @@ const API_URL = '/api';
 let contentData = {};
 let authToken = localStorage.getItem('admin_token') || '';
 let modalCallback = null;
+let siteStatus = { online: true, maintenanceMode: false, lastToggle: null, accessLogs: [] };
 
 // ===== VARIÁVEIS PARA PERSONALIZAÇÃO =====
 let siteSettings = JSON.parse(localStorage.getItem('site_settings')) || {
@@ -1759,23 +1733,14 @@ function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('selected_theme', theme);
   siteSettings.theme = theme;
-  
-  // Salvar para o site principal
   localStorage.setItem('y2k_site_theme', theme);
   
-  // Atualizar botões ativos
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.remove('active');
-    if (btn.dataset.theme === theme) {
-      btn.classList.add('active');
-    }
+    if (btn.dataset.theme === theme) btn.classList.add('active');
   });
-  
-  // Atualizar select no painel de personalização
   const colorScheme = document.getElementById('colorScheme');
   if (colorScheme) colorScheme.value = theme;
-  
-  // Sincronizar com servidor
   syncThemeWithServer();
 }
 
@@ -1783,19 +1748,10 @@ async function syncThemeWithServer() {
   try {
     await fetch('/api/save-theme', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      },
-      body: JSON.stringify({ 
-        theme: siteSettings.theme,
-        primaryColor: siteSettings.primaryColor 
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ theme: siteSettings.theme, primaryColor: siteSettings.primaryColor })
     });
-    console.log('✅ Tema sincronizado:', siteSettings.theme, siteSettings.primaryColor);
-  } catch (error) {
-    console.error('Erro ao sincronizar tema:', error);
-  }
+  } catch (error) {}
 }
 
 function loadTheme() {
@@ -1805,47 +1761,11 @@ function loadTheme() {
 
 // ===== FUNÇÕES DE PERSONALIZAÇÃO =====
 function updatePreview() {
-  const fontSize = document.getElementById('fontSize');
-  const borderRadius = document.getElementById('borderRadius');
-  const lineHeight = document.getElementById('lineHeight');
-  const letterSpacing = document.getElementById('letterSpacing');
-  
-  if (fontSize) document.getElementById('fontSizeValue').textContent = fontSize.value + 'px';
-  if (borderRadius) document.getElementById('borderRadiusValue').textContent = borderRadius.value + 'px';
-  if (lineHeight) document.getElementById('lineHeightValue').textContent = lineHeight.value;
-  if (letterSpacing) document.getElementById('letterSpacingValue').textContent = letterSpacing.value + 'px';
-  
   const primaryColor = document.getElementById('primaryColor')?.value;
-  const fontFamily = document.getElementById('fontFamily')?.value;
-  const textStyle = document.getElementById('textStyle')?.value;
-  
   if (primaryColor) {
     document.getElementById('previewBadge').style.backgroundColor = primaryColor;
     document.getElementById('previewBtnPrimary').style.backgroundColor = primaryColor;
   }
-  
-  const fontSample = document.getElementById('fontSample');
-  if (fontSample) {
-    fontSample.style.fontFamily = fontFamily;
-    fontSample.style.fontSize = fontSize?.value + 'px';
-    fontSample.style.fontWeight = document.getElementById('headingWeight')?.value;
-    fontSample.style.textTransform = textStyle;
-    fontSample.style.lineHeight = lineHeight?.value;
-    fontSample.style.letterSpacing = letterSpacing?.value + 'px';
-  }
-}
-
-function testAnimation(type) {
-  const boxes = ['animBox1', 'animBox2', 'animBox3'];
-  boxes.forEach(id => {
-    const box = document.getElementById(id);
-    box.classList.remove('pulse', 'bounce', 'spin');
-  });
-  
-  const box = document.getElementById('animBox1');
-  if (type === 'pulse') box.classList.add('pulse');
-  else if (type === 'bounce') box.classList.add('bounce');
-  else if (type === 'spin') box.classList.add('spin');
 }
 
 function resetSettings() {
@@ -1868,7 +1788,6 @@ function resetSettings() {
       lineHeight: 1.6,
       letterSpacing: 0
     };
-    
     loadSettingsToForm();
     applyAllSettings();
   }
@@ -1877,74 +1796,182 @@ function resetSettings() {
 function loadSettingsToForm() {
   document.getElementById('colorScheme').value = siteSettings.theme;
   document.getElementById('primaryColor').value = siteSettings.primaryColor;
-  document.getElementById('fontFamily').value = siteSettings.fontFamily;
-  document.getElementById('fontSize').value = siteSettings.fontSize;
-  document.getElementById('animationStyle').value = siteSettings.animationStyle;
-  document.getElementById('animationSpeed').value = siteSettings.animationSpeed;
-  document.getElementById('specialEffects').value = siteSettings.specialEffects;
-  document.getElementById('hoverEffect').value = siteSettings.hoverEffect;
-  document.getElementById('cardStyle').value = siteSettings.cardStyle;
-  document.getElementById('contentWidth').value = siteSettings.contentWidth;
-  document.getElementById('borderRadius').value = siteSettings.borderRadius;
-  document.getElementById('spacing').value = siteSettings.spacing;
-  document.getElementById('headingWeight').value = siteSettings.headingWeight;
-  document.getElementById('textStyle').value = siteSettings.textStyle;
-  document.getElementById('lineHeight').value = siteSettings.lineHeight;
-  document.getElementById('letterSpacing').value = siteSettings.letterSpacing;
-  
   updatePreview();
 }
 
 function saveSettings() {
   siteSettings = {
     theme: document.getElementById('colorScheme').value,
-    primaryColor: document.getElementById('primaryColor').value,
-    fontFamily: document.getElementById('fontFamily').value,
-    fontSize: parseInt(document.getElementById('fontSize').value),
-    animationStyle: document.getElementById('animationStyle').value,
-    animationSpeed: document.getElementById('animationSpeed').value,
-    specialEffects: document.getElementById('specialEffects').value,
-    hoverEffect: document.getElementById('hoverEffect').value,
-    cardStyle: document.getElementById('cardStyle').value,
-    contentWidth: document.getElementById('contentWidth').value,
-    borderRadius: parseInt(document.getElementById('borderRadius').value),
-    spacing: document.getElementById('spacing').value,
-    headingWeight: parseInt(document.getElementById('headingWeight').value),
-    textStyle: document.getElementById('textStyle').value,
-    lineHeight: parseFloat(document.getElementById('lineHeight').value),
-    letterSpacing: parseFloat(document.getElementById('letterSpacing').value)
+    primaryColor: document.getElementById('primaryColor').value
   };
-  
   localStorage.setItem('site_settings', JSON.stringify(siteSettings));
 }
 
 function applyAllSettings() {
   saveSettings();
   setTheme(siteSettings.theme);
-  
-  // Aplicar configurações globais no painel
   document.documentElement.style.setProperty('--primary', siteSettings.primaryColor);
   document.documentElement.style.setProperty('--primary-dark', adjustColor(siteSettings.primaryColor, -20));
   document.documentElement.style.setProperty('--primary-light', adjustColor(siteSettings.primaryColor, 20));
   document.documentElement.style.setProperty('--primary-neon', siteSettings.primaryColor);
   
-  // ⭐⭐⭐ SALVAR PARA O SITE PRINCIPAL ⭐⭐⭐
   localStorage.setItem('y2k_primary_color', siteSettings.primaryColor);
   localStorage.setItem('y2k_site_theme', siteSettings.theme);
   localStorage.setItem('y2k_site_settings', JSON.stringify(siteSettings));
-  
-  // Salvar em cookie também
   document.cookie = `y2k_primary_color=${siteSettings.primaryColor}; path=/; max-age=31536000`;
   document.cookie = `y2k_site_theme=${siteSettings.theme}; path=/; max-age=31536000`;
   
-  // Sincronizar com servidor
   syncThemeWithServer();
-  
   updatePreview();
   showSuccess('settings-success');
+  alert('✅ Configurações aplicadas! Atualize o site principal (F5) para ver as mudanças.');
+}
+
+// ===== CONFIGURAÇÕES DO SITE =====
+async function loadSiteStatus() {
+  try {
+    const res = await fetch('/api/site-status');
+    const data = await res.json();
+    siteStatus = data;
+    updateSiteStatusUI();
+    updateDashboardStatus();
+  } catch (error) {
+    console.error('Erro ao carregar status:', error);
+  }
+}
+
+function updateSiteStatusUI() {
+  const iconEl = document.getElementById('siteStatusIcon');
+  const titleEl = document.getElementById('siteStatusTitle');
+  const descEl = document.getElementById('siteStatusDescription');
+  const lastToggleEl = document.getElementById('siteStatusLastToggle');
   
-  alert('✅ Configurações aplicadas! A cor foi salva. Atualize o site principal (F5) para ver a mudança.');
-  console.log('✅ Cor salva:', siteSettings.primaryColor);
+  // Reset active states
+  document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+  
+  if (!siteStatus.online) {
+    iconEl.className = 'site-status-icon offline';
+    iconEl.innerHTML = '<i class="fas fa-power-off"></i>';
+    titleEl.textContent = '🔴 Site Offline';
+    descEl.textContent = 'O site está inacessível para todos os visitantes.';
+    document.getElementById('btnOffline').classList.add('active');
+  } else if (siteStatus.maintenanceMode) {
+    iconEl.className = 'site-status-icon maintenance';
+    iconEl.innerHTML = '<i class="fas fa-tools"></i>';
+    titleEl.textContent = '⚠️ Modo Manutenção';
+    descEl.textContent = 'Visitantes veem a página de manutenção.';
+    document.getElementById('btnMaintenance').classList.add('active');
+  } else {
+    iconEl.className = 'site-status-icon online';
+    iconEl.innerHTML = '<i class="fas fa-globe"></i>';
+    titleEl.textContent = '🟢 Site Online';
+    descEl.textContent = 'O site está acessível normalmente.';
+    document.getElementById('btnOnline').classList.add('active');
+  }
+  
+  if (siteStatus.lastToggle) {
+    lastToggleEl.textContent = `Última alteração: ${new Date(siteStatus.lastToggle).toLocaleString('pt-BR')}`;
+  } else {
+    lastToggleEl.textContent = 'Nenhuma alteração registrada';
+  }
+  
+  // Atualizar logs
+  const logsContainer = document.getElementById('siteLogsContainer');
+  if (siteStatus.accessLogs && siteStatus.accessLogs.length > 0) {
+    logsContainer.innerHTML = siteStatus.accessLogs.slice(-20).reverse().map(log => `
+      <div class="log-item">
+        <span class="log-time">[${new Date(log.timestamp).toLocaleString('pt-BR')}]</span>
+        ${log.action}
+      </div>
+    `).join('');
+  } else {
+    logsContainer.innerHTML = '<div class="log-item">Nenhum log registrado.</div>';
+  }
+}
+
+function updateDashboardStatus() {
+  const badge = document.getElementById('dashboardStatusBadge');
+  const text = document.getElementById('dashboardStatusText');
+  if (!badge || !text) return;
+  
+  badge.className = 'status-badge';
+  if (!siteStatus.online) {
+    badge.classList.add('offline');
+    text.textContent = 'Site Offline';
+  } else if (siteStatus.maintenanceMode) {
+    badge.classList.add('maintenance');
+    text.textContent = 'Em Manutenção';
+  } else {
+    badge.classList.add('online');
+    text.textContent = 'Sistema Online';
+  }
+}
+
+async function setSiteMode(mode) {
+  let action = '';
+  let message = '';
+  
+  if (mode === 'online') {
+    if (siteStatus.online && !siteStatus.maintenanceMode) {
+      alert('O site já está ONLINE.');
+      return;
+    }
+    action = 'online';
+    message = 'Colocar o site ONLINE?';
+  } else if (mode === 'maintenance') {
+    if (siteStatus.maintenanceMode) {
+      alert('O site já está em MODO MANUTENÇÃO.');
+      return;
+    }
+    action = 'maintenance';
+    message = 'Ativar MODO MANUTENÇÃO?';
+  } else if (mode === 'offline') {
+    if (!siteStatus.online) {
+      alert('O site já está OFFLINE.');
+      return;
+    }
+    action = 'offline';
+    message = 'Colocar o site OFFLINE?';
+  }
+  
+  showModal('Confirmar Ação', message, async () => {
+    showLoading();
+    try {
+      // Aqui você pode adicionar uma chamada API para salvar o status
+      // Por enquanto, vamos simular
+      if (action === 'online') {
+        siteStatus.online = true;
+        siteStatus.maintenanceMode = false;
+      } else if (action === 'maintenance') {
+        siteStatus.online = true;
+        siteStatus.maintenanceMode = true;
+      } else if (action === 'offline') {
+        siteStatus.online = false;
+        siteStatus.maintenanceMode = false;
+      }
+      siteStatus.lastToggle = Date.now();
+      siteStatus.accessLogs.push({
+        timestamp: Date.now(),
+        action: `[PAINEL] Site alterado para: ${action}`
+      });
+      
+      updateSiteStatusUI();
+      updateDashboardStatus();
+      showSuccess('siteconfig-success');
+    } catch (error) {
+      showError('Erro ao alterar status');
+    } finally {
+      hideLoading();
+    }
+  });
+}
+
+function clearLogs() {
+  showModal('Limpar Logs', 'Tem certeza que deseja limpar todos os logs?', () => {
+    siteStatus.accessLogs = [];
+    updateSiteStatusUI();
+    showSuccess('siteconfig-success');
+  });
 }
 
 // ===== DETECÇÃO DE MOBILE =====
@@ -1962,9 +1989,7 @@ if (isMobileDevice()) {
 async function verifyToken() {
   if (!authToken) return false;
   try {
-    const res = await fetch(`${API_URL}/verify`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
+    const res = await fetch(`${API_URL}/verify`, { headers: { 'Authorization': `Bearer ${authToken}` } });
     return res.ok;
   } catch { return false; }
 }
@@ -1972,16 +1997,10 @@ async function verifyToken() {
 // ===== INICIALIZAÇÃO =====
 (async function init() {
   loadTheme();
-  
   if (!isMobileDevice() && authToken) {
     const isValid = await verifyToken();
-    if (isValid) {
-      showPanel();
-      await loadContent();
-    } else {
-      localStorage.removeItem('admin_token');
-      authToken = '';
-    }
+    if (isValid) { showPanel(); await loadContent(); loadSiteStatus(); }
+    else { localStorage.removeItem('admin_token'); authToken = ''; }
   }
 })();
 
@@ -1992,16 +2011,8 @@ function showModal(title, message, onConfirm) {
   modalCallback = onConfirm;
   document.getElementById('confirmModal').classList.add('active');
 }
-
-function closeModal() {
-  document.getElementById('confirmModal').classList.remove('active');
-  modalCallback = null;
-}
-
-document.getElementById('modalConfirmBtn').onclick = function() {
-  if (modalCallback) modalCallback();
-  closeModal();
-};
+function closeModal() { document.getElementById('confirmModal').classList.remove('active'); modalCallback = null; }
+document.getElementById('modalConfirmBtn').onclick = function() { if (modalCallback) modalCallback(); closeModal(); };
 
 // ===== LOADING =====
 function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
@@ -2011,15 +2022,8 @@ function hideLoading() { document.getElementById('loadingOverlay').classList.rem
 function togglePassword() {
   const input = document.getElementById('passwordInput');
   const icon = document.getElementById('toggleIcon');
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.classList.remove('fa-eye');
-    icon.classList.add('fa-eye-slash');
-  } else {
-    input.type = 'password';
-    icon.classList.remove('fa-eye-slash');
-    icon.classList.add('fa-eye');
-  }
+  if (input.type === 'password') { input.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+  else { input.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
 }
 
 async function handleLogin(e) {
@@ -2027,51 +2031,18 @@ async function handleLogin(e) {
   const password = document.getElementById('passwordInput').value;
   const btn = document.getElementById('loginBtn');
   const errorEl = document.getElementById('loginError');
-  const errorText = document.getElementById('loginErrorText');
-  
-  btn.disabled = true;
-  errorEl.style.display = 'none';
-  showLoading();
-  
+  btn.disabled = true; errorEl.style.display = 'none'; showLoading();
   try {
-    const res = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password })
-    });
-    
+    const res = await fetch(`${API_URL}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
     const data = await res.json();
-    
-    if (res.ok) {
-      authToken = data.token;
-      localStorage.setItem('admin_token', authToken);
-      showPanel();
-      await loadContent();
-    } else {
-      errorText.textContent = data.error || 'Senha incorreta!';
-      errorEl.style.display = 'block';
-    }
-  } catch (error) {
-    errorText.textContent = 'Erro de conexão. Tente novamente.';
-    errorEl.style.display = 'block';
-  } finally {
-    btn.disabled = false;
-    hideLoading();
-  }
+    if (res.ok) { authToken = data.token; localStorage.setItem('admin_token', authToken); showPanel(); await loadContent(); loadSiteStatus(); }
+    else { document.getElementById('loginErrorText').textContent = data.error || 'Senha incorreta!'; errorEl.style.display = 'block'; }
+  } catch { document.getElementById('loginErrorText').textContent = 'Erro de conexão.'; errorEl.style.display = 'block'; }
+  finally { btn.disabled = false; hideLoading(); }
 }
 
-function showPanel() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('adminPanel').style.display = 'block';
-}
-
-function logout() {
-  showModal('Confirmar Saída', 'Tem certeza que deseja sair do painel?', () => {
-    localStorage.removeItem('admin_token');
-    authToken = '';
-    location.reload();
-  });
-}
+function showPanel() { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('adminPanel').style.display = 'block'; }
+function logout() { showModal('Confirmar Saída', 'Sair do painel?', () => { localStorage.removeItem('admin_token'); authToken = ''; location.reload(); }); }
 
 // ===== NAVEGAÇÃO =====
 function showTab(tab) {
@@ -2080,64 +2051,33 @@ function showTab(tab) {
   document.getElementById(tab + '-panel').classList.add('active');
   document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
   
-  const loaders = {
-    dashboard: loadDashboard,
-    projetos: loadProjetos,
-    hero: loadHero,
-    sobre: loadSobre,
-    contato: loadContato,
-    bots: loadBots,
-    personalizacao: loadPersonalizacao
-  };
-  if (loaders[tab]) loaders[tab]();
+  if (tab === 'dashboard') loadDashboard();
+  else if (tab === 'projetos') loadProjetos();
+  else if (tab === 'hero') loadHero();
+  else if (tab === 'sobre') loadSobre();
+  else if (tab === 'contato') loadContato();
+  else if (tab === 'bots') loadBots();
+  else if (tab === 'personalizacao') { if (typeof loadPersonalizacao === 'function') loadPersonalizacao(); }
+  else if (tab === 'siteconfig') loadSiteStatus();
 }
 
 // ===== API =====
 async function apiCall(endpoint, options = {}) {
-  const res = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
-      ...options.headers
-    }
-  });
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.error || 'Erro na requisição');
-  }
+  const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}`, ...options.headers } });
+  if (!res.ok) { const error = await res.json(); throw new Error(error.error || 'Erro'); }
   return res.json();
 }
 
 async function loadContent() {
-  try {
-    contentData = await apiCall('/content');
-    const now = new Date().toLocaleString('pt-BR');
-    const el = document.getElementById('lastUpdateDashboard');
-    if (el) el.textContent = 'Última atualização: ' + now;
-    if (document.getElementById('dashboard-panel').classList.contains('active')) loadDashboard();
-  } catch (error) {
-    console.error('Erro ao carregar:', error);
-  }
+  try { contentData = await apiCall('/content'); if (document.getElementById('dashboard-panel').classList.contains('active')) loadDashboard(); }
+  catch (e) { console.error(e); }
 }
 
 async function saveContent(data, successId) {
   showLoading();
-  try {
-    const result = await apiCall('/save', {
-      method: 'POST',
-      body: JSON.stringify({ content: data })
-    });
-    contentData = data;
-    showSuccess(successId);
-    await loadContent();
-    return result;
-  } catch (error) {
-    showError(error.message);
-    throw error;
-  } finally {
-    hideLoading();
-  }
+  try { await apiCall('/save', { method: 'POST', body: JSON.stringify({ content: data }) }); contentData = data; showSuccess(successId); await loadContent(); }
+  catch (e) { showError(e.message); }
+  finally { hideLoading(); }
 }
 
 // ===== DASHBOARD =====
@@ -2147,31 +2087,21 @@ function loadDashboard() {
   const stats = contentData.stats || [];
   
   document.getElementById('dashboard-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-code-branch"></i></div><div class="stat-card-value">${projetos.length}</div><div class="stat-card-label">Soluções</div><div class="stat-trend up"><i class="fas fa-arrow-up"></i> Ativas</div></div>
-    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-tools"></i></div><div class="stat-card-value">${skills.length}</div><div class="stat-card-label">Skills</div><div class="stat-trend up"><i class="fas fa-check"></i> Configuradas</div></div>
-    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-users"></i></div><div class="stat-card-value">${stats[0]?.valor || 0}+</div><div class="stat-card-label">${stats[0]?.label || 'Usuários'}</div><div class="stat-trend up"><i class="fas fa-arrow-up"></i> +12%</div></div>
-    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-calendar"></i></div><div class="stat-card-value">${stats[1]?.valor || 1}</div><div class="stat-card-label">${stats[1]?.label || 'Ano'}</div><div class="stat-trend"><i class="fas fa-minus"></i> Estável</div></div>
+    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-code-branch"></i></div><div class="stat-card-value">${projetos.length}</div><div class="stat-card-label">Soluções</div></div>
+    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-tools"></i></div><div class="stat-card-value">${skills.length}</div><div class="stat-card-label">Skills</div></div>
+    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-users"></i></div><div class="stat-card-value">${stats[0]?.valor || 0}+</div><div class="stat-card-label">${stats[0]?.label || 'Usuários'}</div></div>
+    <div class="stat-card"><div class="stat-card-header"><i class="fas fa-calendar"></i></div><div class="stat-card-value">${stats[1]?.valor || 1}</div><div class="stat-card-label">${stats[1]?.label || 'Ano'}</div></div>
   `;
   
   const maxVal = Math.max(projetos.length, skills.length, stats.length, 1);
   document.getElementById('content-chart').innerHTML = [
-    { label: 'Soluções', value: projetos.length, color: 'var(--primary)' },
-    { label: 'Skills', value: skills.length, color: 'var(--purple)' },
-    { label: 'Stats', value: stats.length, color: 'var(--info)' }
-  ].map(d => `<div class="chart-bar-container"><div class="chart-value">${d.value}</div><div class="chart-bar" style="height: ${(d.value/maxVal)*120}px; background: ${d.color};"></div><div class="chart-label">${d.label}</div></div>`).join('');
+    { label: 'Soluções', value: projetos.length },
+    { label: 'Skills', value: skills.length },
+    { label: 'Stats', value: stats.length }
+  ].map(d => `<div class="chart-bar-container"><div class="chart-bar" style="height: ${(d.value/maxVal)*120}px;"></div><div class="chart-label">${d.label}</div></div>`).join('');
   
-  const total = projetos.length + skills.length + stats.length || 1;
-  document.getElementById('distribution-stats').innerHTML = `
-    <div class="dist-item"><i class="fas fa-code-branch" style="color: var(--primary); width: 24px;"></i><div class="dist-info"><div class="dist-header"><span class="dist-name">Soluções</span><span class="dist-value">${projetos.length}</span></div><div class="dist-bar"><div class="dist-progress" style="width: ${(projetos.length/total)*100}%; background: var(--primary);"></div></div></div></div>
-    <div class="dist-item"><i class="fas fa-tools" style="color: var(--purple); width: 24px;"></i><div class="dist-info"><div class="dist-header"><span class="dist-name">Skills</span><span class="dist-value">${skills.length}</span></div><div class="dist-bar"><div class="dist-progress" style="width: ${(skills.length/total)*100}%; background: var(--purple);"></div></div></div></div>
-    <div class="dist-item"><i class="fas fa-chart-bar" style="color: var(--info); width: 24px;"></i><div class="dist-info"><div class="dist-header"><span class="dist-name">Stats</span><span class="dist-value">${stats.length}</span></div><div class="dist-bar"><div class="dist-progress" style="width: ${(stats.length/total)*100}%; background: var(--info);"></div></div></div></div>
-  `;
-  
-  document.getElementById('activity-list').innerHTML = `
-    <div class="activity-item"><div class="activity-icon"><i class="fas fa-check-circle" style="color: var(--success);"></i></div><div class="activity-content"><div class="activity-title">Sistema online</div><div class="activity-time">Agora mesmo</div></div></div>
-    <div class="activity-item"><div class="activity-icon"><i class="fas fa-database"></i></div><div class="activity-content"><div class="activity-title">${projetos.length} soluções</div><div class="activity-time">Total no portfólio</div></div></div>
-    <div class="activity-item"><div class="activity-icon"><i class="fas fa-code"></i></div><div class="activity-content"><div class="activity-title">${skills.length} skills</div><div class="activity-time">${skills.slice(0,3).join(', ')}${skills.length>3?'...':''}</div></div></div>
-  `;
+  document.getElementById('activity-list').innerHTML = `<div class="activity-item"><div class="activity-icon"><i class="fas fa-check-circle"></i></div><div class="activity-content"><div class="activity-title">Sistema online</div></div></div>`;
+  updateDashboardStatus();
 }
 
 // ===== HERO =====
@@ -2181,14 +2111,12 @@ function loadHero() {
   document.getElementById('hero-titulo').value = h.titulo || '';
   document.getElementById('hero-bio').value = h.bio || '';
   document.getElementById('hero-descricao').value = h.descricao || '';
-  
-  const stats = contentData.stats || [];
+  const stats = contentData.stats || [{valor:0,label:''},{valor:0,label:''},{valor:0,label:''}];
   document.getElementById('stats-container').innerHTML = stats.map((s, i) => `
-    <div class="form-group"><label>Stat ${i+1} - Valor</label><input type="number" id="stat${i}-valor" value="${s.valor}"></div>
-    <div class="form-group"><label>Stat ${i+1} - Label</label><input type="text" id="stat${i}-label" value="${s.label}" maxlength="50"></div>
+    <div class="form-group"><label>Valor ${i+1}</label><input type="number" id="stat${i}-valor" value="${s.valor}"></div>
+    <div class="form-group"><label>Label ${i+1}</label><input type="text" id="stat${i}-label" value="${s.label}"></div>
   `).join('');
 }
-
 async function saveHero() {
   contentData.hero = {
     badge: document.getElementById('hero-badge').value.trim(),
@@ -2196,10 +2124,7 @@ async function saveHero() {
     bio: document.getElementById('hero-bio').value.trim(),
     descricao: document.getElementById('hero-descricao').value.trim()
   };
-  contentData.stats = contentData.stats.map((_, i) => ({
-    valor: parseInt(document.getElementById(`stat${i}-valor`).value) || 0,
-    label: document.getElementById(`stat${i}-label`).value.trim()
-  }));
+  contentData.stats = [0,1,2].map(i => ({ valor: parseInt(document.getElementById(`stat${i}-valor`).value) || 0, label: document.getElementById(`stat${i}-label`).value.trim() }));
   await saveContent(contentData, 'hero-success');
 }
 
@@ -2207,12 +2132,10 @@ async function saveHero() {
 function loadProjetos() {
   const projetos = contentData.projetos || [];
   document.getElementById('projetos-count').textContent = `${projetos.length} soluções`;
-  
-  const container = document.getElementById('projetos-container');
-  container.innerHTML = projetos.map((p, i) => `
-    <div class="project-item-card" data-projeto-id="${p.id || i}">
+  document.getElementById('projetos-container').innerHTML = projetos.map((p, i) => `
+    <div class="project-item-card">
       <div class="project-item-header">
-        <div class="project-item-title"><i class="fas ${p.icone || 'fa-code'}"></i><h3>${p.nome || 'Novo'}</h3></div>
+        <div class="project-item-title"><i class="fas ${p.icone || 'fa-code'}"></i><h3>${p.nome || ''}</h3></div>
         <div class="project-actions">
           <button class="btn-icon" onclick="moveProjeto(${i}, 'up')" ${i===0?'disabled':''}><i class="fas fa-chevron-up"></i></button>
           <button class="btn-icon" onclick="moveProjeto(${i}, 'down')" ${i===projetos.length-1?'disabled':''}><i class="fas fa-chevron-down"></i></button>
@@ -2220,51 +2143,37 @@ function loadProjetos() {
         </div>
       </div>
       <div class="project-item-fields">
-        <div class="form-group"><label>Nome</label><input type="text" id="proj-nome-${i}" value="${p.nome || ''}" maxlength="100"></div>
-        <div class="form-group"><label>Tipo</label><input type="text" id="proj-tipo-${i}" value="${p.tipo || ''}" maxlength="100"></div>
-        <div class="form-group"><label>Ícone</label><input type="text" id="proj-icone-${i}" value="${p.icone || 'fa-code'}" maxlength="50"></div>
-        <div class="form-group full-width"><label>Descrição</label><textarea id="proj-desc-${i}" maxlength="500">${p.descricao || ''}</textarea></div>
+        <div class="form-group"><label>Nome</label><input type="text" id="proj-nome-${i}" value="${p.nome || ''}"></div>
+        <div class="form-group"><label>Tipo</label><input type="text" id="proj-tipo-${i}" value="${p.tipo || ''}"></div>
+        <div class="form-group"><label>Ícone</label><input type="text" id="proj-icone-${i}" value="${p.icone || 'fa-code'}"></div>
+        <div class="form-group full-width"><label>Descrição</label><textarea id="proj-desc-${i}">${p.descricao || ''}</textarea></div>
       </div>
     </div>
   `).join('');
 }
-
 function addProjeto() {
   if (!contentData.projetos) contentData.projetos = [];
-  contentData.projetos.push({
-    id: 'proj_' + Date.now() + '_' + Math.random().toString(36),
-    nome: 'Nova Solução',
-    tipo: 'Tipo',
-    descricao: 'Descrição',
-    icone: 'fa-code'
-  });
+  contentData.projetos.push({ id: 'proj_' + Date.now(), nome: 'Nova Solução', tipo: 'Tipo', descricao: 'Descrição', icone: 'fa-code' });
   loadProjetos();
 }
-
 function confirmRemoveProjeto(index) {
-  showModal('Remover Solução', 'Tem certeza que deseja remover esta solução? Esta ação não pode ser desfeita.', () => {
-    contentData.projetos.splice(index, 1);
-    loadProjetos();
-  });
+  showModal('Remover', 'Remover esta solução?', () => { contentData.projetos.splice(index, 1); loadProjetos(); });
 }
-
 function moveProjeto(index, direction) {
   const arr = contentData.projetos;
   if (direction === 'up' && index > 0) [arr[index-1], arr[index]] = [arr[index], arr[index-1]];
   else if (direction === 'down' && index < arr.length-1) [arr[index], arr[index+1]] = [arr[index+1], arr[index]];
   loadProjetos();
 }
-
 async function saveProjetos() {
   const projetos = [];
   document.querySelectorAll('.project-item-card').forEach((card, i) => {
-    const id = contentData.projetos[i]?.id || 'proj_' + Date.now() + '_' + i;
     projetos.push({
-      id: id,
-      nome: document.getElementById(`proj-nome-${i}`)?.value.trim() || '',
-      tipo: document.getElementById(`proj-tipo-${i}`)?.value.trim() || '',
-      descricao: document.getElementById(`proj-desc-${i}`)?.value.trim() || '',
-      icone: document.getElementById(`proj-icone-${i}`)?.value.trim() || 'fa-code'
+      id: contentData.projetos[i]?.id || 'proj_' + Date.now(),
+      nome: document.getElementById(`proj-nome-${i}`)?.value || '',
+      tipo: document.getElementById(`proj-tipo-${i}`)?.value || '',
+      descricao: document.getElementById(`proj-desc-${i}`)?.value || '',
+      icone: document.getElementById(`proj-icone-${i}`)?.value || 'fa-code'
     });
   });
   contentData.projetos = projetos;
@@ -2277,37 +2186,18 @@ function loadSobre() {
   document.getElementById('sobre-nome').value = s.nome || '';
   document.getElementById('sobre-bio').value = s.bio || '';
   document.getElementById('sobre-texto').value = s.texto || '';
-  
   const skills = s.skills || [];
   document.getElementById('skills-container').innerHTML = `
-    <div class="skills-input-container" id="skills-list">
+    <div class="skills-input-container">
       ${skills.map((sk, i) => `<span class="skill-tag-input">${sk}<i class="fas fa-times" onclick="removeSkill(${i})"></i></span>`).join('')}
-      <button class="btn-add-skill" onclick="addSkill()"><i class="fas fa-plus"></i> Adicionar Skill</button>
+      <button class="btn-add-skill" onclick="addSkill()"><i class="fas fa-plus"></i> Adicionar</button>
     </div>
   `;
 }
-
-function addSkill() {
-  const skill = prompt('Digite a nova skill:');
-  if (skill?.trim()) {
-    if (!contentData.sobre.skills) contentData.sobre.skills = [];
-    contentData.sobre.skills.push(skill.trim());
-    loadSobre();
-  }
-}
-
-function removeSkill(index) {
-  contentData.sobre.skills.splice(index, 1);
-  loadSobre();
-}
-
+function addSkill() { const skill = prompt('Skill:'); if (skill) { if (!contentData.sobre.skills) contentData.sobre.skills = []; contentData.sobre.skills.push(skill); loadSobre(); } }
+function removeSkill(index) { contentData.sobre.skills.splice(index, 1); loadSobre(); }
 async function saveSobre() {
-  contentData.sobre = {
-    ...contentData.sobre,
-    nome: document.getElementById('sobre-nome').value.trim(),
-    bio: document.getElementById('sobre-bio').value.trim(),
-    texto: document.getElementById('sobre-texto').value.trim()
-  };
+  contentData.sobre = { ...contentData.sobre, nome: document.getElementById('sobre-nome').value.trim(), bio: document.getElementById('sobre-bio').value.trim(), texto: document.getElementById('sobre-texto').value.trim() };
   await saveContent(contentData, 'sobre-success');
 }
 
@@ -2319,11 +2209,10 @@ function loadContato() {
   document.getElementById('contato-horario-semana').value = c.horario_semana || '';
   document.getElementById('contato-horario-fim').value = c.horario_fim || '';
 }
-
 async function saveContato() {
   contentData.contato = {
     discord: document.getElementById('contato-discord').value.trim(),
-    email: document.getElementById('contato-email').value.trim().toLowerCase(),
+    email: document.getElementById('contato-email').value.trim(),
     horario_semana: document.getElementById('contato-horario-semana').value.trim(),
     horario_fim: document.getElementById('contato-horario-fim').value.trim()
   };
@@ -2332,127 +2221,45 @@ async function saveContato() {
 
 // ===== SISTEMAS =====
 let botsData = {};
-
 async function loadBots() {
   showLoading();
   try {
     const data = await apiCall('/bots');
     botsData = data;
-    renderBots();
-    showSuccess('bots-success');
-  } catch (error) {
-    showError('Erro ao carregar sistemas');
-  } finally {
-    hideLoading();
-  }
-}
-
-function renderBots() {
-  const statsContainer = document.getElementById('bots-stats');
-  statsContainer.innerHTML = `
-    <div class="stat-card">
-      <div class="stat-card-header"><i class="fas fa-microchip"></i></div>
-      <div class="stat-card-value">${botsData.totalBots || 0}</div>
-      <div class="stat-card-label">Total de Sistemas</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-header"><i class="fas fa-circle" style="color: var(--success);"></i></div>
-      <div class="stat-card-value">${botsData.botsOnline || 0}</div>
-      <div class="stat-card-label">Sistemas Online</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-header"><i class="fas fa-server"></i></div>
-      <div class="stat-card-value">${botsData.totalServidores || 0}</div>
-      <div class="stat-card-label">Servidores</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-header"><i class="fas fa-users"></i></div>
-      <div class="stat-card-value">${(botsData.totalUsuarios || 0).toLocaleString()}</div>
-      <div class="stat-card-label">Usuários</div>
-    </div>
-  `;
-  
-  const bots = botsData.bots || [];
-  document.getElementById('bots-count').textContent = `${bots.length} sistemas`;
-  
-  const container = document.getElementById('bots-container');
-  container.innerHTML = bots.map(bot => {
-    const statusClass = bot.status === 'online' ? 'online' : bot.status === 'manutencao' ? 'manutencao' : 'offline';
-    const statusText = bot.status === 'online' ? 'Online' : bot.status === 'manutencao' ? 'Manutenção' : 'Offline';
-    
-    return `
-      <div class="bot-card">
-        <div class="bot-header">
-          <div class="bot-avatar"><i class="fas ${bot.avatar}"></i></div>
-          <div class="bot-info">
-            <h3>${bot.nome}</h3>
-            <span class="bot-status ${statusClass}"><i class="fas fa-circle"></i> ${statusText}</span>
-          </div>
-        </div>
-        <div class="bot-details">
-          <div class="bot-detail-item">
-            <span class="bot-detail-label"><i class="fas fa-server"></i> Servidores</span>
-            <span class="bot-detail-value">${bot.servidores}</span>
-          </div>
-          <div class="bot-detail-item">
-            <span class="bot-detail-label"><i class="fas fa-users"></i> Usuários</span>
-            <span class="bot-detail-value">${bot.usuarios.toLocaleString()}</span>
-          </div>
-          <div class="bot-detail-item">
-            <span class="bot-detail-label"><i class="fas fa-terminal"></i> Comandos</span>
-            <span class="bot-detail-value">${bot.comandos}</span>
-          </div>
-          <div class="bot-detail-item">
-            <span class="bot-detail-label"><i class="fas fa-clock"></i> Ping</span>
-            <span class="bot-detail-value">${bot.ping}ms</span>
-          </div>
-          <div class="bot-detail-item">
-            <span class="bot-detail-label"><i class="fas fa-chart-line"></i> Uptime</span>
-            <span class="bot-detail-value">${bot.uptime}</span>
-          </div>
-        </div>
-        <div class="bot-footer">
-          <span class="bot-version"><i class="fas fa-code-branch"></i> v${bot.versao}</span>
-          <button class="btn-refresh-bot" onclick="refreshBot('${bot.id}')">
-            <i class="fas fa-sync-alt"></i> Atualizar
-          </button>
-        </div>
-      </div>
+    document.getElementById('bots-stats').innerHTML = `
+      <div class="stat-card"><div class="stat-card-value">${data.totalBots || 0}</div><div class="stat-card-label">Sistemas</div></div>
+      <div class="stat-card"><div class="stat-card-value">${data.botsOnline || 0}</div><div class="stat-card-label">Online</div></div>
     `;
-  }).join('');
+    document.getElementById('bots-count').textContent = `${data.bots?.length || 0} sistemas`;
+    document.getElementById('bots-container').innerHTML = (data.bots || []).map(bot => `
+      <div class="bot-card">
+        <div class="bot-header"><div class="bot-avatar"><i class="fas ${bot.avatar}"></i></div><div class="bot-info"><h3>${bot.nome}</h3><span class="bot-status ${bot.status}"><i class="fas fa-circle"></i> ${bot.status}</span></div></div>
+        <div class="bot-details">
+          <div class="bot-detail-item"><span class="bot-detail-label">Servidores</span><span class="bot-detail-value">${bot.servidores}</span></div>
+          <div class="bot-detail-item"><span class="bot-detail-label">Usuários</span><span class="bot-detail-value">${bot.usuarios}</span></div>
+          <div class="bot-detail-item"><span class="bot-detail-label">Ping</span><span class="bot-detail-value">${bot.ping}ms</span></div>
+          <div class="bot-detail-item"><span class="bot-detail-label">Uptime</span><span class="bot-detail-value">${bot.uptime}</span></div>
+        </div>
+        <div class="bot-footer"><span class="bot-version">v${bot.versao}</span><button class="btn-refresh-bot" onclick="refreshBot('${bot.id}')"><i class="fas fa-sync-alt"></i> Atualizar</button></div>
+      </div>
+    `).join('');
+    showSuccess('bots-success');
+  } catch { showError('Erro'); }
+  finally { hideLoading(); }
 }
-
 async function refreshBot(botId) {
   showLoading();
-  try {
-    await apiCall(`/bots/${botId}/status`, {
-      method: 'POST',
-      body: JSON.stringify({ ping: Math.floor(Math.random() * 20) + 30 })
-    });
-    await loadBots();
-  } catch (error) {
-    showError('Erro ao atualizar sistema');
-  } finally {
-    hideLoading();
-  }
-}
-
-// ===== PERSONALIZAÇÃO =====
-function loadPersonalizacao() {
-  loadSettingsToForm();
+  try { await apiCall(`/bots/${botId}/status`, { method: 'POST', body: JSON.stringify({ ping: Math.floor(Math.random() * 20) + 30 }) }); await loadBots(); }
+  catch { showError('Erro'); }
+  finally { hideLoading(); }
 }
 
 // ===== UI HELPERS =====
-function showSuccess(id) {
-  const el = document.getElementById(id);
-  if (el) { el.style.display = 'flex'; setTimeout(() => el.style.display = 'none', 3000); }
-}
-
+function showSuccess(id) { const el = document.getElementById(id); if (el) { el.style.display = 'flex'; setTimeout(() => el.style.display = 'none', 3000); } }
 function showError(msg) {
   const el = document.getElementById('globalSuccess');
   el.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1))';
-  el.style.borderColor = 'var(--danger)';
-  el.style.color = 'var(--danger)';
+  el.style.borderColor = 'var(--danger)'; el.style.color = 'var(--danger)';
   document.getElementById('successMessage').textContent = msg;
   el.style.display = 'flex';
   setTimeout(() => { el.style.display = 'none'; el.style.background = ''; el.style.borderColor = ''; el.style.color = ''; }, 4000);
