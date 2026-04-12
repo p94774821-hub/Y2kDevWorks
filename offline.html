@@ -41,7 +41,6 @@
             overflow-x: hidden;
         }
         
-        /* Canvas para os pontinhos vermelhos */
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -52,7 +51,6 @@
             pointer-events: none;
         }
         
-        /* Fundo com borrão (blur) */
         body::before {
             content: '';
             position: fixed;
@@ -62,28 +60,14 @@
                 radial-gradient(circle at 85% 75%, rgba(239, 68, 68, 0.08) 0%, transparent 45%),
                 radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 60%);
             z-index: 0;
-            animation: bgPulse 10s ease-in-out infinite alternate;
-            backdrop-filter: blur(80px);
-            -webkit-backdrop-filter: blur(80px);
-        }
-        
-        /* Grid pattern sutil */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(168, 85, 247, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(168, 85, 247, 0.02) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: 0;
-            opacity: 0.3;
-            pointer-events: none;
+            animation: bgPulse 12s ease-in-out infinite alternate;
+            backdrop-filter: blur(60px);
+            -webkit-backdrop-filter: blur(60px);
         }
         
         @keyframes bgPulse {
             0% { opacity: 0.5; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.03); }
+            100% { opacity: 1; transform: scale(1.02); }
         }
         
         .container {
@@ -102,12 +86,10 @@
             z-index: 10;
         }
         
-        /* ===== MOBILE/TABLET - LAYOUT NORMAL ===== */
         .container {
             max-width: 550px;
         }
         
-        /* ===== PC - CONTAINER MAIS ESTREITO ===== */
         @media (min-width: 769px) {
             .container {
                 max-width: 420px !important;
@@ -156,12 +138,6 @@
             transition: all 0.3s;
         }
         
-        .logo-icon:hover {
-            transform: scale(1.05);
-            border-color: var(--primary);
-            box-shadow: 0 0 40px rgba(168, 85, 247, 0.4);
-        }
-        
         .logo-text {
             font-size: clamp(1.4rem, 5vw, 1.7rem);
             font-weight: 700;
@@ -169,16 +145,13 @@
         }
         
         .logo-text span:first-child { color: white; }
-        .logo-text .highlight { 
-            color: var(--primary); 
-            text-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
-        }
+        .logo-text .highlight { color: var(--primary); text-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
         
         .icon {
             font-size: clamp(4rem, 12vw, 5.5rem);
             color: var(--danger);
             margin-bottom: 25px;
-            animation: pulse 2.5s ease-in-out infinite;
+            animation: pulse 3s ease-in-out infinite;
             filter: drop-shadow(0 0 50px rgba(239, 68, 68, 0.5));
         }
         
@@ -193,16 +166,9 @@
             margin-bottom: 15px;
             font-family: 'Space Grotesk', sans-serif;
             background: linear-gradient(135deg, #fff, #fca5a5, var(--danger));
-            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradientShift 4s ease infinite;
-        }
-        
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
         }
         
         .message {
@@ -231,7 +197,7 @@
         
         .status-badge i {
             font-size: 0.7rem;
-            animation: blink 1.5s ease-in-out infinite;
+            animation: blink 2s ease-in-out infinite;
         }
         
         @keyframes blink {
@@ -252,12 +218,6 @@
             border: 1px solid var(--border-light);
             border-radius: var(--radius-md);
             transition: all 0.3s;
-        }
-        
-        .info-item:hover {
-            border-color: var(--primary);
-            background: rgba(168, 85, 247, 0.06);
-            transform: translateY(-2px);
         }
         
         .info-item i {
@@ -287,15 +247,8 @@
             backdrop-filter: blur(10px);
         }
         
-        .info-box i {
-            color: var(--primary);
-            margin-right: 8px;
-        }
-        
-        .info-box p {
-            color: var(--text-secondary);
-            font-size: clamp(0.9rem, 3vw, 1rem);
-        }
+        .info-box i { color: var(--primary); margin-right: 8px; }
+        .info-box p { color: var(--text-secondary); font-size: clamp(0.9rem, 3vw, 1rem); }
         
         .btn-group {
             display: flex;
@@ -337,71 +290,25 @@
             gap: 5px;
         }
         
-        .footer i {
-            color: var(--primary);
-            margin: 0 5px;
-        }
+        .footer i { color: var(--primary); margin: 0 5px; }
+        .footer .divider { color: var(--border-medium); margin: 0 10px; }
         
-        .footer .divider {
-            color: var(--border-medium);
-            margin: 0 10px;
-        }
-        
-        /* ===== MOBILE - AJUSTES ===== */
         @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .info-item {
-                padding: 12px;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                text-align: left;
-            }
-            
-            .info-item i {
-                font-size: 1.8rem;
-                margin-bottom: 0;
-                width: 40px;
-                text-align: center;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-                width: 100%;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .logo-icon {
-                width: 45px;
-                height: 45px;
-                font-size: 1.5rem;
-            }
-            
-            .logo-text {
-                font-size: 1.2rem;
-            }
+            .container { padding: 30px 20px; }
+            .info-grid { grid-template-columns: 1fr; gap: 10px; }
+            .info-item { padding: 12px; display: flex; align-items: center; gap: 15px; text-align: left; }
+            .info-item i { font-size: 1.8rem; margin-bottom: 0; width: 40px; text-align: center; }
+            .btn-group { flex-direction: column; width: 100%; }
+            .btn { width: 100%; }
+            .logo-icon { width: 45px; height: 45px; font-size: 1.5rem; }
+            .logo-text { font-size: 1.2rem; }
         }
         
-        html, body {
-            max-width: 100%;
-            overflow-x: hidden;
-        }
+        html, body { max-width: 100%; overflow-x: hidden; }
     </style>
 </head>
 <body>
 
-    <!-- Canvas para os pontinhos vermelhos -->
     <canvas id="particle-canvas"></canvas>
 
     <div class="container">
@@ -412,205 +319,104 @@
             </div>
         </div>
         
-        <div class="icon">
-            <i class="fas fa-power-off"></i>
-        </div>
-        
+        <div class="icon"><i class="fas fa-power-off"></i></div>
         <h1>Site Offline</h1>
+        <p class="message">Nosso site está temporariamente offline para manutenção ou atualizações.<br>Estamos trabalhando para voltar o mais rápido possível.</p>
         
-        <p class="message">
-            Nosso site está temporariamente offline para manutenção ou atualizações.<br>
-            Estamos trabalhando para voltar o mais rápido possível.
-        </p>
-        
-        <div class="status-badge">
-            <i class="fas fa-circle"></i>
-            <span>STATUS: OFFLINE</span>
-        </div>
+        <div class="status-badge"><i class="fas fa-circle"></i><span>STATUS: OFFLINE</span></div>
         
         <div class="info-grid">
-            <div class="info-item">
-                <i class="fas fa-clock"></i>
-                <h4>Tempo Estimado</h4>
-                <p>Indisponível</p>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-server"></i>
-                <h4>Servidores</h4>
-                <p>Manutenção</p>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-headset"></i>
-                <h4>Suporte</h4>
-                <p>@Y2k_Nat</p>
-            </div>
+            <div class="info-item"><i class="fas fa-clock"></i><h4>Tempo Estimado</h4><p>Indisponível</p></div>
+            <div class="info-item"><i class="fas fa-server"></i><h4>Servidores</h4><p>Manutenção</p></div>
+            <div class="info-item"><i class="fas fa-headset"></i><h4>Suporte</h4><p>@Y2k_Nat</p></div>
         </div>
         
-        <div class="info-box">
-            <i class="fas fa-info-circle"></i>
-            <p>Por favor, tente novamente mais tarde. Agradecemos sua paciência!</p>
-        </div>
+        <div class="info-box"><i class="fas fa-info-circle"></i><p>Por favor, tente novamente mais tarde. Agradecemos sua paciência!</p></div>
         
-        <div class="btn-group">
-            <a href="/" class="btn">
-                <i class="fas fa-home"></i> Página Inicial
-            </a>
-        </div>
+        <div class="btn-group"><a href="/" class="btn"><i class="fas fa-home"></i> Página Inicial</a></div>
         
         <div class="footer">
-            <div>
-                <i class="fas fa-terminal"></i> Y2kDevWorks <i class="fas fa-terminal"></i>
-            </div>
-            <div style="font-size: 0.8rem;">
-                Sistemas e Automação para Discord
-                <span class="divider">|</span>
-                <i class="far fa-copyright"></i> 2026
-            </div>
+            <div><i class="fas fa-terminal"></i> Y2kDevWorks <i class="fas fa-terminal"></i></div>
+            <div style="font-size: 0.8rem;">Sistemas e Automação para Discord<span class="divider">|</span><i class="far fa-copyright"></i> 2026</div>
         </div>
     </div>
 
     <script>
         (function() {
             const canvas = document.getElementById('particle-canvas');
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d', { alpha: true, willReadFrequently: false });
             
             let width = window.innerWidth;
             let height = window.innerHeight;
             
-            // Configuração dos pontinhos
+            // ⭐ REDUZIDO: Apenas 20 partículas
             const particles = [];
-            const particleCount = 50; // Quantidade de pontinhos
+            const particleCount = 20;
             
-            // Cores dos pontinhos (tons de vermelho)
             const colors = [
-                'rgba(239, 68, 68, 0.4)',   // #ef4444
-                'rgba(248, 113, 113, 0.35)', // #f87171
-                'rgba(220, 38, 38, 0.3)',    // #dc2626
+                'rgba(239, 68, 68, 0.35)',
+                'rgba(248, 113, 113, 0.3)',
                 'rgba(239, 68, 68, 0.25)',
-                'rgba(185, 28, 28, 0.2)'     // #b91c1c
+                'rgba(220, 38, 38, 0.2)'
             ];
             
-            // Inicializar partículas
             function initParticles() {
                 particles.length = 0;
                 for (let i = 0; i < particleCount; i++) {
                     particles.push({
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        radius: Math.random() * 4 + 2, // 2px a 6px
+                        radius: Math.random() * 4 + 2,
                         color: colors[Math.floor(Math.random() * colors.length)],
-                        vx: (Math.random() - 0.5) * 0.08, // Velocidade bem lenta
-                        vy: (Math.random() - 0.5) * 0.08,
-                        blur: Math.random() * 6 + 2 // Borrão individual
+                        vx: (Math.random() - 0.5) * 0.04, // Mais lento
+                        vy: (Math.random() - 0.5) * 0.04
                     });
                 }
             }
             
-            // Atualizar posições
             function updateParticles() {
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    
-                    // Mover lentamente
+                for (let p of particles) {
                     p.x += p.vx;
                     p.y += p.vy;
                     
-                    // Quicar nas bordas (loop suave)
-                    if (p.x < -20) p.x = width + 20;
-                    if (p.x > width + 20) p.x = -20;
-                    if (p.y < -20) p.y = height + 20;
-                    if (p.y > height + 20) p.y = -20;
-                    
-                    // Pequena variação na velocidade (movimento orgânico)
-                    if (Math.random() < 0.01) {
-                        p.vx += (Math.random() - 0.5) * 0.02;
-                        p.vy += (Math.random() - 0.5) * 0.02;
-                        
-                        // Limitar velocidade
-                        const maxSpeed = 0.15;
-                        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-                        if (speed > maxSpeed) {
-                            p.vx = (p.vx / speed) * maxSpeed;
-                            p.vy = (p.vy / speed) * maxSpeed;
-                        }
-                    }
+                    if (p.x < -30) p.x = width + 30;
+                    if (p.x > width + 30) p.x = -30;
+                    if (p.y < -30) p.y = height + 30;
+                    if (p.y > height + 30) p.y = -30;
                 }
             }
             
-            // Desenhar partículas com borrão
             function drawParticles() {
                 ctx.clearRect(0, 0, width, height);
                 
-                // Aplicar blur no canvas inteiro para efeito de borrão
-                ctx.filter = 'blur(3px)';
-                
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    
-                    // Desenhar círculo com glow
-                    const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 3);
+                // ⭐ SEM BLUR constante - mais leve
+                for (let p of particles) {
+                    // Apenas um círculo simples com glow via gradiente
+                    const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2.5);
                     gradient.addColorStop(0, p.color);
-                    gradient.addColorStop(0.5, p.color.replace(/[\d\.]+\)$/g, '0.15)'));
                     gradient.addColorStop(1, 'transparent');
                     
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
+                    ctx.arc(p.x, p.y, p.radius * 2.5, 0, Math.PI * 2);
                     ctx.fillStyle = gradient;
                     ctx.fill();
                     
-                    // Núcleo do pontinho
-                    ctx.filter = 'blur(1px)';
+                    // Núcleo
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
+                    ctx.arc(p.x, p.y, p.radius * 0.7, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color.replace(/[\d\.]+\)$/g, '0.6)');
                     ctx.fill();
-                    
-                    // Resetar filtro para o próximo
-                    ctx.filter = 'blur(3px)';
                 }
-                
-                // Resetar filtro
-                ctx.filter = 'none';
             }
             
-            // Conectar partículas próximas com linhas tênues
-            function drawConnections() {
-                ctx.filter = 'blur(2px)';
-                ctx.lineWidth = 0.5;
-                
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const p1 = particles[i];
-                        const p2 = particles[j];
-                        
-                        const dx = p1.x - p2.x;
-                        const dy = p1.y - p2.y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-                        
-                        // Conectar apenas partículas próximas
-                        if (distance < 100) {
-                            const opacity = (1 - distance / 100) * 0.08;
-                            ctx.strokeStyle = `rgba(239, 68, 68, ${opacity})`;
-                            ctx.beginPath();
-                            ctx.moveTo(p1.x, p1.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-                
-                ctx.filter = 'none';
-            }
+            // ⭐ REMOVIDO drawConnections() - era pesado
             
-            // Loop de animação
             function animate() {
                 updateParticles();
                 drawParticles();
-                drawConnections();
                 requestAnimationFrame(animate);
             }
             
-            // Redimensionar canvas
             function resizeCanvas() {
                 width = window.innerWidth;
                 height = window.innerHeight;
@@ -619,17 +425,9 @@
                 initParticles();
             }
             
-            // Inicializar
             window.addEventListener('resize', resizeCanvas);
             resizeCanvas();
             animate();
-            
-            // Reinicializar partículas quando a página ficar visível novamente
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) {
-                    initParticles();
-                }
-            });
         })();
     </script>
 </body>
