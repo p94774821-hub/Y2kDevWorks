@@ -212,50 +212,6 @@
             50% { opacity: 0.3; }
         }
         
-        .progress-container {
-            margin-bottom: 30px;
-            width: 100%;
-            max-width: 350px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-full);
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-        
-        .progress-fill {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--danger), #f87171, var(--danger));
-            border-radius: var(--radius-full);
-            animation: progressPulse 2s ease-in-out infinite;
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
-        }
-        
-        @keyframes progressPulse {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-        
-        .progress-text {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .progress-text i {
-            color: var(--primary);
-        }
-        
         .info-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -465,16 +421,6 @@
             <span>STATUS: OFFLINE</span>
         </div>
         
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
-            </div>
-            <div class="progress-text">
-                <i class="fas fa-sync-alt fa-spin"></i>
-                <span>Aguardando retorno do sistema...</span>
-            </div>
-        </div>
-        
         <div class="info-grid">
             <div class="info-item">
                 <i class="fas fa-clock"></i>
@@ -499,10 +445,7 @@
         </div>
         
         <div class="btn-group">
-            <a href="javascript:location.reload()" class="btn">
-                <i class="fas fa-sync-alt"></i> Tentar Novamente
-            </a>
-            <a href="/" class="btn btn-secondary">
+            <a href="/" class="btn">
                 <i class="fas fa-home"></i> Página Inicial
             </a>
         </div>
@@ -518,48 +461,5 @@
             </div>
         </div>
     </div>
-    
-    <script>
-        // Tentar reconectar automaticamente
-        let retryCount = 0;
-        const maxRetries = 10;
-        
-        function checkStatus() {
-            fetch('/health')
-                .then(res => {
-                    if (res.ok) {
-                        location.reload();
-                    } else {
-                        retryCount++;
-                        updateRetryMessage();
-                    }
-                })
-                .catch(() => {
-                    retryCount++;
-                    updateRetryMessage();
-                });
-        }
-        
-        function updateRetryMessage() {
-            const progressText = document.querySelector('.progress-text span');
-            if (progressText && retryCount > 0) {
-                progressText.textContent = `Tentativa ${retryCount}/${maxRetries}...`;
-            }
-        }
-        
-        // Verificar a cada 15 segundos
-        setInterval(checkStatus, 15000);
-        
-        // Verificar quando a página ficar visível novamente
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                retryCount = 0;
-                checkStatus();
-            }
-        });
-        
-        // Primeira verificação após 5 segundos
-        setTimeout(checkStatus, 5000);
-    </script>
 </body>
 </html>
