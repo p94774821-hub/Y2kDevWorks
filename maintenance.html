@@ -12,7 +12,6 @@
         :root {
             --primary: #a855f7;
             --primary-dark: #9333ea;
-            --primary-light: #c084fc;
             --warning: #f59e0b;
             --warning-light: #fbbf24;
             --bg-dark: #050505;
@@ -26,7 +25,7 @@
             --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
             --shadow-glow: 0 0 80px rgba(245, 158, 11, 0.15);
             --radius-xl: 32px;
-            --radius-lg: 24px;
+            --radius-lg: 20px;
             --radius-md: 16px;
             --radius-full: 9999px;
         }
@@ -77,9 +76,9 @@
         
         .container {
             text-align: center;
-            max-width: 650px;
+            max-width: 520px;
             width: 100%;
-            padding: clamp(35px, 8vw, 55px) clamp(25px, 6vw, 45px);
+            padding: clamp(35px, 5vw, 50px) clamp(25px, 5vw, 45px);
             background: var(--bg-card);
             border: 1px solid var(--border-warning);
             border-radius: var(--radius-xl);
@@ -88,6 +87,7 @@
             animation: fadeInUp 0.6s ease;
             position: relative;
             overflow: hidden;
+            margin: 0 auto;
         }
         
         .container::before {
@@ -110,17 +110,17 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
         
         .logo-icon {
             font-family: 'JetBrains Mono', monospace;
-            font-size: clamp(1.8rem, 6vw, 2.2rem);
+            font-size: clamp(1.6rem, 5vw, 2rem);
             font-weight: 800;
             color: var(--primary);
             background: rgba(168, 85, 247, 0.1);
-            width: clamp(50px, 12vw, 60px);
-            height: clamp(50px, 12vw, 60px);
+            width: clamp(45px, 10vw, 55px);
+            height: clamp(45px, 10vw, 55px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -138,7 +138,7 @@
         }
         
         .logo-text {
-            font-size: clamp(1.4rem, 5vw, 1.7rem);
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
             font-weight: 700;
             letter-spacing: -0.3px;
         }
@@ -150,11 +150,11 @@
         }
         
         .icon {
-            font-size: clamp(4rem, 12vw, 5.5rem);
+            font-size: clamp(3.5rem, 10vw, 5rem);
             color: var(--warning);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             animation: pulse 2.5s ease-in-out infinite;
-            filter: drop-shadow(0 0 50px rgba(245, 158, 11, 0.5));
+            filter: drop-shadow(0 0 40px rgba(245, 158, 11, 0.5));
         }
         
         @keyframes pulse {
@@ -163,9 +163,9 @@
         }
         
         h1 {
-            font-size: clamp(1.8rem, 7vw, 2.5rem);
+            font-size: clamp(1.8rem, 6vw, 2.3rem);
             font-weight: 800;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-family: 'Space Grotesk', sans-serif;
             background: linear-gradient(135deg, #fff, #fcd34d, var(--warning));
             background-size: 200% 200%;
@@ -182,30 +182,30 @@
         
         .message {
             color: var(--text-secondary);
-            margin-bottom: 35px;
-            line-height: 1.7;
-            font-size: clamp(0.95rem, 3.5vw, 1.1rem);
-            padding: 0 10px;
+            margin-bottom: 28px;
+            line-height: 1.6;
+            font-size: clamp(0.9rem, 3vw, 1.05rem);
+            padding: 0 5px;
         }
         
         .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 10px 28px;
+            padding: 9px 24px;
             background: rgba(245, 158, 11, 0.08);
             border: 1.5px solid var(--border-warning);
             border-radius: var(--radius-full);
             color: var(--warning);
             font-weight: 600;
-            font-size: clamp(0.85rem, 3vw, 1rem);
-            margin-bottom: 30px;
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+            margin-bottom: 25px;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1);
         }
         
         .status-badge i {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             animation: blink 1.5s ease-in-out infinite;
         }
         
@@ -215,20 +215,20 @@
         }
         
         .progress-container {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             width: 100%;
-            max-width: 400px;
+            max-width: 350px;
             margin-left: auto;
             margin-right: auto;
         }
         
         .progress-bar {
             width: 100%;
-            height: 6px;
+            height: 5px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: var(--radius-full);
             overflow: hidden;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .progress-fill {
@@ -237,7 +237,7 @@
             background: linear-gradient(90deg, var(--warning), var(--warning-light), var(--warning));
             border-radius: var(--radius-full);
             animation: progressPulse 2s ease-in-out infinite;
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
         }
         
         @keyframes progressPulse {
@@ -247,7 +247,7 @@
         
         .progress-text {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -261,12 +261,12 @@
         .info-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
+            margin-bottom: 25px;
         }
         
         .info-item {
-            padding: 18px 10px;
+            padding: 14px 8px;
             background: rgba(168, 85, 247, 0.03);
             border: 1px solid var(--border-light);
             border-radius: var(--radius-md);
@@ -280,29 +280,29 @@
         }
         
         .info-item i {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             color: var(--primary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .info-item h4 {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             color: var(--text-primary);
         }
         
         .info-item p {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
         }
         
         .info-box {
-            padding: 18px 20px;
+            padding: 16px 18px;
             background: rgba(168, 85, 247, 0.04);
             border: 1px solid var(--border-light);
             border-radius: var(--radius-lg);
-            margin-bottom: 30px;
+            margin-bottom: 28px;
             backdrop-filter: blur(10px);
         }
         
@@ -313,7 +313,7 @@
         
         .info-box p {
             color: var(--text-secondary);
-            font-size: clamp(0.9rem, 3vw, 1rem);
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
         }
         
         .btn-group {
@@ -327,14 +327,14 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 14px 28px;
+            gap: 8px;
+            padding: 13px 26px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             text-decoration: none;
             border-radius: var(--radius-full);
             font-weight: 600;
-            font-size: clamp(0.9rem, 3vw, 1rem);
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
             transition: all 0.3s;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
@@ -346,62 +346,49 @@
             box-shadow: 0 15px 40px rgba(168, 85, 247, 0.5);
         }
         
-        .btn-secondary {
-            background: transparent;
-            border: 1.5px solid var(--border-warning);
-            color: var(--text-primary);
-            box-shadow: none;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(245, 158, 11, 0.08);
-            border-color: var(--warning);
-            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
-        }
-        
         .footer {
-            margin-top: 40px;
+            margin-top: 35px;
             color: var(--text-muted);
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
             font-family: 'JetBrains Mono', monospace;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
         }
         
         .footer i {
             color: var(--primary);
-            margin: 0 5px;
+            margin: 0 4px;
         }
         
         .footer .divider {
             color: var(--border-medium);
-            margin: 0 10px;
+            margin: 0 8px;
         }
         
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 480px) {
             .container {
-                padding: 30px 20px;
+                padding: 28px 18px;
             }
             
             .info-grid {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 8px;
             }
             
             .info-item {
-                padding: 14px;
+                padding: 12px;
                 display: flex;
                 align-items: center;
-                gap: 15px;
+                gap: 12px;
                 text-align: left;
             }
             
             .info-item i {
-                font-size: 2rem;
+                font-size: 1.6rem;
                 margin-bottom: 0;
-                width: 45px;
+                width: 35px;
                 text-align: center;
             }
             
@@ -413,25 +400,12 @@
             .btn {
                 width: 100%;
             }
-            
-            .logo-icon {
-                width: 45px;
-                height: 45px;
-                font-size: 1.5rem;
-            }
-            
-            .logo-text {
-                font-size: 1.2rem;
-            }
         }
         
-        @media (min-width: 481px) and (max-width: 768px) {
-            .info-grid {
-                gap: 10px;
-            }
-            
-            .info-item {
-                padding: 14px 8px;
+        @media (min-width: 769px) {
+            /* Em telas grandes, manter container compacto */
+            .container {
+                max-width: 480px;
             }
         }
         
@@ -497,7 +471,7 @@
         
         <div class="info-box">
             <i class="fas fa-info-circle"></i>
-            <p>Nossos sistemas estão sendo atualizados. Agradecemos sua paciência e compreensão!</p>
+            <p>Nossos sistemas estão sendo atualizados. Agradecemos sua paciência!</p>
         </div>
         
         <div class="btn-group">
