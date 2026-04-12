@@ -15,7 +15,7 @@
             --warning: #f59e0b;
             --warning-light: #fbbf24;
             --bg-dark: #050505;
-            --bg-card: rgba(12, 12, 12, 0.98);
+            --bg-card: rgba(12, 12, 12, 0.95);
             --text-primary: #ffffff;
             --text-secondary: #a0a0a0;
             --text-muted: #606060;
@@ -43,32 +43,48 @@
             overflow-x: hidden;
         }
         
+        /* Canvas para os pontinhos amarelos */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        /* Fundo com borrão (blur) */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
             background: 
-                radial-gradient(circle at 15% 25%, rgba(168, 85, 247, 0.1) 0%, transparent 35%),
-                radial-gradient(circle at 85% 75%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 60%);
-            z-index: -2;
+                radial-gradient(circle at 15% 25%, rgba(168, 85, 247, 0.12) 0%, transparent 35%),
+                radial-gradient(circle at 85% 75%, rgba(245, 158, 11, 0.1) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 60%);
+            z-index: 0;
             animation: bgPulse 10s ease-in-out infinite alternate;
+            backdrop-filter: blur(80px);
+            -webkit-backdrop-filter: blur(80px);
         }
         
+        /* Grid pattern sutil */
         body::after {
             content: '';
             position: fixed;
             inset: 0;
             background-image: 
-                linear-gradient(rgba(168, 85, 247, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
+                linear-gradient(rgba(168, 85, 247, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.02) 1px, transparent 1px);
             background-size: 50px 50px;
-            z-index: -1;
-            opacity: 0.5;
+            z-index: 0;
+            opacity: 0.3;
+            pointer-events: none;
         }
         
         @keyframes bgPulse {
-            0% { opacity: 0.6; transform: scale(1); }
+            0% { opacity: 0.5; transform: scale(1); }
             100% { opacity: 1; transform: scale(1.03); }
         }
         
@@ -85,6 +101,7 @@
             position: relative;
             overflow: hidden;
             margin: 0 auto;
+            z-index: 10;
         }
         
         /* ===== MOBILE/TABLET - LAYOUT NORMAL ===== */
@@ -429,6 +446,10 @@
     </style>
 </head>
 <body>
+
+    <!-- Canvas para os pontinhos amarelos -->
+    <canvas id="particle-canvas"></canvas>
+
     <div class="container">
         <div class="logo">
             <div class="logo-icon">&gt;_</div>
@@ -503,5 +524,170 @@
             </div>
         </div>
     </div>
+
+    <script>
+        (function() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            
+            // Configuração dos pontinhos amarelos
+            const particles = [];
+            const particleCount = 45; // Quantidade de pontinhos
+            
+            // Cores dos pontinhos (tons de amarelo/laranja)
+            const colors = [
+                'rgba(245, 158, 11, 0.4)',   // #f59e0b - warning
+                'rgba(251, 191, 36, 0.35)',  // #fbbf24 - warning-light
+                'rgba(253, 230, 138, 0.3)',  // #fde68a - amarelo claro
+                'rgba(245, 158, 11, 0.25)',
+                'rgba(217, 119, 6, 0.2)',    // #d97706 - âmbar
+                'rgba(252, 211, 77, 0.3)'    // #fcd34d - amarelo
+            ];
+            
+            // Inicializar partículas
+            function initParticles() {
+                particles.length = 0;
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        radius: Math.random() * 4 + 2, // 2px a 6px
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        vx: (Math.random() - 0.5) * 0.06, // Velocidade bem lenta
+                        vy: (Math.random() - 0.5) * 0.06,
+                        blur: Math.random() * 6 + 2 // Borrão individual
+                    });
+                }
+            }
+            
+            // Atualizar posições
+            function updateParticles() {
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    
+                    // Mover lentamente
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    
+                    // Quicar nas bordas (loop suave)
+                    if (p.x < -20) p.x = width + 20;
+                    if (p.x > width + 20) p.x = -20;
+                    if (p.y < -20) p.y = height + 20;
+                    if (p.y > height + 20) p.y = -20;
+                    
+                    // Pequena variação na velocidade (movimento orgânico)
+                    if (Math.random() < 0.008) {
+                        p.vx += (Math.random() - 0.5) * 0.015;
+                        p.vy += (Math.random() - 0.5) * 0.015;
+                        
+                        // Limitar velocidade
+                        const maxSpeed = 0.12;
+                        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                        if (speed > maxSpeed) {
+                            p.vx = (p.vx / speed) * maxSpeed;
+                            p.vy = (p.vy / speed) * maxSpeed;
+                        }
+                    }
+                }
+            }
+            
+            // Desenhar partículas com borrão
+            function drawParticles() {
+                ctx.clearRect(0, 0, width, height);
+                
+                // Aplicar blur no canvas inteiro para efeito de borrão
+                ctx.filter = 'blur(3px)';
+                
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    
+                    // Desenhar círculo com glow
+                    const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 3);
+                    gradient.addColorStop(0, p.color);
+                    gradient.addColorStop(0.5, p.color.replace(/[\d\.]+\)$/g, '0.12)'));
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                    
+                    // Núcleo do pontinho
+                    ctx.filter = 'blur(1px)';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    
+                    // Resetar filtro para o próximo
+                    ctx.filter = 'blur(3px)';
+                }
+                
+                // Resetar filtro
+                ctx.filter = 'none';
+            }
+            
+            // Conectar partículas próximas com linhas tênues
+            function drawConnections() {
+                ctx.filter = 'blur(2px)';
+                ctx.lineWidth = 0.5;
+                
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p1 = particles[i];
+                        const p2 = particles[j];
+                        
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        // Conectar apenas partículas próximas
+                        if (distance < 100) {
+                            const opacity = (1 - distance / 100) * 0.06;
+                            ctx.strokeStyle = `rgba(245, 158, 11, ${opacity})`;
+                            ctx.beginPath();
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                
+                ctx.filter = 'none';
+            }
+            
+            // Loop de animação
+            function animate() {
+                updateParticles();
+                drawParticles();
+                drawConnections();
+                requestAnimationFrame(animate);
+            }
+            
+            // Redimensionar canvas
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                initParticles();
+            }
+            
+            // Inicializar
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            animate();
+            
+            // Reinicializar partículas quando a página ficar visível novamente
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    initParticles();
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
