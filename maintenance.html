@@ -2,20 +2,33 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, shrink-to-fit=no">
     <title>Em Manutenção - Y2kDevWorks</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
             --primary: #a855f7;
             --primary-dark: #9333ea;
+            --primary-light: #c084fc;
             --warning: #f59e0b;
+            --warning-light: #fbbf24;
             --bg-dark: #050505;
+            --bg-card: rgba(12, 12, 12, 0.98);
             --text-primary: #ffffff;
             --text-secondary: #a0a0a0;
+            --text-muted: #606060;
+            --border-light: rgba(168, 85, 247, 0.15);
+            --border-medium: rgba(168, 85, 247, 0.25);
+            --border-warning: rgba(245, 158, 11, 0.3);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 80px rgba(245, 158, 11, 0.15);
+            --radius-xl: 32px;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-full: 9999px;
         }
         
         body {
@@ -28,29 +41,63 @@
             justify-content: center;
             padding: 20px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
         }
         
+        /* Background Premium */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 20% 30%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
-                        radial-gradient(circle at 80% 70%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(168, 85, 247, 0.1) 0%, transparent 35%),
+                radial-gradient(circle at 85% 75%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 60%);
+            z-index: -2;
+            animation: bgPulse 10s ease-in-out infinite alternate;
+        }
+        
+        /* Grid Pattern */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(168, 85, 247, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: -1;
+            opacity: 0.5;
+        }
+        
+        @keyframes bgPulse {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.03); }
         }
         
         .container {
             text-align: center;
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
-            padding: 50px 40px;
-            background: rgba(12, 12, 12, 0.95);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            border-radius: 32px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(245, 158, 11, 0.1);
-            backdrop-filter: blur(20px);
+            padding: clamp(35px, 8vw, 55px) clamp(25px, 6vw, 45px);
+            background: var(--bg-card);
+            border: 1px solid var(--border-warning);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+            backdrop-filter: blur(30px);
             animation: fadeInUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--warning), var(--warning-light), var(--warning), transparent);
         }
         
         @keyframes fadeInUp {
@@ -62,40 +109,52 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
+            gap: 12px;
+            margin-bottom: 35px;
         }
         
         .logo-icon {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem;
+            font-size: clamp(1.8rem, 6vw, 2.2rem);
             font-weight: 800;
             color: var(--primary);
             background: rgba(168, 85, 247, 0.1);
-            width: 55px;
-            height: 55px;
+            width: clamp(50px, 12vw, 60px);
+            height: clamp(50px, 12vw, 60px);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 14px;
-            border: 1.5px solid rgba(168, 85, 247, 0.3);
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border-medium);
             text-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .logo-icon:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.4);
         }
         
         .logo-text {
-            font-size: 1.5rem;
+            font-size: clamp(1.4rem, 5vw, 1.7rem);
             font-weight: 700;
+            letter-spacing: -0.3px;
         }
         
         .logo-text span:first-child { color: white; }
-        .logo-text .highlight { color: var(--primary); text-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
+        .logo-text .highlight { 
+            color: var(--primary); 
+            text-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+        }
         
         .icon {
-            font-size: 5rem;
+            font-size: clamp(4rem, 12vw, 5.5rem);
             color: var(--warning);
             margin-bottom: 25px;
             animation: pulse 2.5s ease-in-out infinite;
-            filter: drop-shadow(0 0 40px rgba(245, 158, 11, 0.4));
+            filter: drop-shadow(0 0 50px rgba(245, 158, 11, 0.5));
         }
         
         @keyframes pulse {
@@ -104,35 +163,45 @@
         }
         
         h1 {
-            font-size: 2.2rem;
+            font-size: clamp(1.8rem, 7vw, 2.5rem);
             font-weight: 800;
             margin-bottom: 15px;
             font-family: 'Space Grotesk', sans-serif;
-            background: linear-gradient(135deg, #fff, var(--warning));
+            background: linear-gradient(135deg, #fff, #fcd34d, var(--warning));
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: gradientShift 4s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
         
         .message {
             color: var(--text-secondary);
             margin-bottom: 35px;
             line-height: 1.7;
-            font-size: 1.05rem;
+            font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+            padding: 0 10px;
         }
         
         .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 24px;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 50px;
+            gap: 10px;
+            padding: 10px 28px;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1.5px solid var(--border-warning);
+            border-radius: var(--radius-full);
             color: var(--warning);
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: clamp(0.85rem, 3vw, 1rem);
             margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1);
         }
         
         .status-badge i {
@@ -142,47 +211,99 @@
         
         @keyframes blink {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
+            50% { opacity: 0.3; }
         }
         
         .progress-container {
             margin-bottom: 30px;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .progress-bar {
             width: 100%;
             height: 6px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            border-radius: var(--radius-full);
             overflow: hidden;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         
         .progress-fill {
-            width: 75%;
+            width: 68%;
             height: 100%;
-            background: linear-gradient(90deg, var(--warning), #fbbf24);
-            border-radius: 10px;
+            background: linear-gradient(90deg, var(--warning), var(--warning-light), var(--warning));
+            border-radius: var(--radius-full);
             animation: progressPulse 2s ease-in-out infinite;
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
         }
         
         @keyframes progressPulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.8; width: 65%; }
+            50% { opacity: 1; width: 72%; }
         }
         
         .progress-text {
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .progress-text i {
+            color: var(--warning);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .info-item {
+            padding: 18px 10px;
+            background: rgba(168, 85, 247, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            transition: all 0.3s;
+        }
+        
+        .info-item:hover {
+            border-color: var(--warning);
+            background: rgba(245, 158, 11, 0.04);
+            transform: translateY(-2px);
+        }
+        
+        .info-item i {
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .info-item h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        
+        .info-item p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
         
         .info-box {
-            padding: 20px;
-            background: rgba(168, 85, 247, 0.05);
-            border: 1px solid rgba(168, 85, 247, 0.15);
-            border-radius: 20px;
-            margin-bottom: 25px;
+            padding: 18px 20px;
+            background: rgba(168, 85, 247, 0.04);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
         }
         
         .info-box i {
@@ -192,39 +313,132 @@
         
         .info-box p {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
-            padding: 14px 30px;
-            background: transparent;
-            color: var(--text-primary);
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
             text-decoration: none;
-            border-radius: 50px;
+            border-radius: var(--radius-full);
             font-weight: 600;
+            font-size: clamp(0.9rem, 3vw, 1rem);
             transition: all 0.3s;
-            border: 1.5px solid rgba(168, 85, 247, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
+            flex: 0 1 auto;
         }
         
         .btn:hover {
-            border-color: var(--primary);
-            background: rgba(168, 85, 247, 0.05);
             transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(168, 85, 247, 0.5);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1.5px solid var(--border-warning);
+            color: var(--text-primary);
+            box-shadow: none;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(245, 158, 11, 0.08);
+            border-color: var(--warning);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
         }
         
         .footer {
             margin-top: 40px;
-            color: #505050;
-            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
             font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
         
         .footer i {
             color: var(--primary);
             margin: 0 5px;
+        }
+        
+        .footer .divider {
+            color: var(--border-medium);
+            margin: 0 10px;
+        }
+        
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .info-item {
+                padding: 14px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                text-align: left;
+            }
+            
+            .info-item i {
+                font-size: 2rem;
+                margin-bottom: 0;
+                width: 45px;
+                text-align: center;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .logo-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.5rem;
+            }
+            
+            .logo-text {
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (min-width: 481px) and (max-width: 768px) {
+            .info-grid {
+                gap: 10px;
+            }
+            
+            .info-item {
+                padding: 14px 8px;
+            }
+        }
+        
+        /* Prevenir overflow */
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
         }
     </style>
 </head>
@@ -258,34 +472,96 @@
                 <div class="progress-fill"></div>
             </div>
             <div class="progress-text">
-                <i class="fas fa-sync-alt fa-spin"></i> Atualização em andamento...
+                <i class="fas fa-sync-alt fa-spin"></i>
+                <span>Atualização em andamento...</span>
+            </div>
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <i class="fas fa-clock"></i>
+                <h4>Previsão</h4>
+                <p>Alguns instantes</p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-code-branch"></i>
+                <h4>Versão</h4>
+                <p>v2.1.0</p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-headset"></i>
+                <h4>Suporte</h4>
+                <p>@Y2k_Nat</p>
             </div>
         </div>
         
         <div class="info-box">
             <i class="fas fa-info-circle"></i>
-            <p>Nossos sistemas estarão disponíveis novamente em alguns instantes.</p>
+            <p>Nossos sistemas estão sendo atualizados. Agradecemos sua paciência e compreensão!</p>
         </div>
         
-        <a href="javascript:location.reload()" class="btn">
-            <i class="fas fa-rotate-right"></i> Verificar Status
-        </a>
+        <div class="btn-group">
+            <a href="javascript:location.reload()" class="btn">
+                <i class="fas fa-rotate-right"></i> Verificar Status
+            </a>
+            <a href="/" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Página Inicial
+            </a>
+        </div>
         
         <div class="footer">
-            <i class="fas fa-terminal"></i> Y2kDevWorks <i class="fas fa-terminal"></i><br>
-            Sistemas e Automação para Discord
+            <div>
+                <i class="fas fa-terminal"></i> Y2kDevWorks <i class="fas fa-terminal"></i>
+            </div>
+            <div style="font-size: 0.8rem;">
+                Sistemas e Automação para Discord
+                <span class="divider">|</span>
+                <i class="far fa-copyright"></i> 2026
+            </div>
         </div>
     </div>
     
     <script>
-        // Tentar reconectar automaticamente a cada 15 segundos
-        setInterval(() => {
+        // Tentar reconectar automaticamente
+        let retryCount = 0;
+        const maxRetries = 15;
+        
+        function checkStatus() {
             fetch('/health')
                 .then(res => {
-                    if (res.ok) location.reload();
+                    if (res.ok) {
+                        location.reload();
+                    } else {
+                        retryCount++;
+                        updateRetryMessage();
+                    }
                 })
-                .catch(() => {});
-        }, 15000);
+                .catch(() => {
+                    retryCount++;
+                    updateRetryMessage();
+                });
+        }
+        
+        function updateRetryMessage() {
+            const progressText = document.querySelector('.progress-text span');
+            if (progressText && retryCount > 0) {
+                progressText.textContent = `Verificando (${retryCount}/${maxRetries})...`;
+            }
+        }
+        
+        // Verificar a cada 12 segundos
+        setInterval(checkStatus, 12000);
+        
+        // Verificar quando a página ficar visível novamente
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                retryCount = 0;
+                checkStatus();
+            }
+        });
+        
+        // Primeira verificação após 5 segundos
+        setTimeout(checkStatus, 5000);
     </script>
 </body>
 </html>
