@@ -1,48 +1,12 @@
 
----
+# 🚀 Y2kDevWorks
 
-<p align="center">
-  <img src="https://i.postimg.cc/L5PdRvV0/Screenshot-20260410-001601-Chrome.jpg" width="100%">
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge">
-  <img src="https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge">
-  <img src="https://img.shields.io/badge/node-18%2B-339933?style=for-the-badge">
-  <img src="https://img.shields.io/badge/discord.js-v14-5865F2?style=for-the-badge">
-  <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge">
-</p>
-
-<h1 align="center">🚀 Y2kDevWorks</h1>
-
-<p align="center">
-  Sistemas e automação para Discord • Arquitetura modular escalável
-</p>
-
-<p align="center">
-  <b>Made by Y2k_Nat</b>
-</p>
+Sistemas profissionais de automação para Discord.  
+Foco em performance, organização e escalabilidade.
 
 ---
 
-## ✦ 🧠 Sobre
-
-O **Y2kDevWorks** é um conjunto de sistemas focados em automação e gerenciamento de servidores Discord.
-
-- 🧩 Estrutura modular  
-- ⚡ Alto desempenho  
-- 🔌 Integração com APIs  
-- 🛡 Controle de permissões  
-
----
-
-## ✦ ⚡ Características
-
-🧩 Modular        → Sistemas independentes ⚡ Performance     → Código otimizado 🔌 Integração     → APIs e banco de dados 🛡 Segurança      → Permissões granulares 📊 Monitoramento  → Logs e controle
-
----
-
-## ✦ 🏗️ Arquitetura
+## 🏗️ Arquitetura
 
 ```mermaid
 flowchart LR
@@ -67,7 +31,7 @@ flowchart LR
 
 ---
 
-✦ 🔄 Fluxo do Sistema
+🔄 Fluxo do Sistema
 
 sequenceDiagram
     participant U as Usuário
@@ -85,9 +49,26 @@ sequenceDiagram
     S-->>C: Resultado
     C-->>U: Retorno
 
+
 ---
 
-✦ 🧩 Expansão
+🧩 Sistemas
+
+💡 Insight → Sistema de sugestões com votação
+
+🏢 Atlas → Registro de propriedades (RP)
+
+🚗 Vehix → Registro e gestão de veículos
+
+🛠️ Utility → Comandos utilitários
+
+⚠️ Warn → Sistema de moderação
+
+
+
+---
+
+📁 Estrutura Base
 
 /new-system
 ├── index.js
@@ -97,7 +78,21 @@ sequenceDiagram
 
 ---
 
-✦ 🎯 Objetivo
+⚙️ Tecnologias
+
+JavaScript (Node.js)
+
+Python
+
+APIs REST
+
+Banco de Dados
+
+
+
+---
+
+🎯 Objetivo
 
 Centralizar sistemas
 
@@ -111,9 +106,21 @@ Escalar facilmente
 
 ---
 
-✦ 📌 Status
+📌 Status
 
-🟢 Online • ⚡ Estável • 🔒 Seguro
+🟢 Online
+⚡ Estável
+🔒 Seguro
+
+
+---
+
+📬 Contato
+
+Discord: @Y2k_Nat
+
+Email: Y2k_Nat@hotmail.com
+
 
 
 ---
@@ -121,5 +128,3 @@ Escalar facilmente
 <p align="center">
   © 2026 Y2kDevWorks • Made by Y2k_Nat
 </p>
-```
----
