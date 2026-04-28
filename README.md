@@ -133,4 +133,3 @@ sequenceDiagram
 <p align="center">
   <b>© 2026 Y2kDevWorks • 𝙼𝚊𝚍𝚎 𝙱𝚢 𝚈𝟸𝚔_𝙽𝚊𝚝</b>
 </p>
-```
